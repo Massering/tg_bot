@@ -55,9 +55,11 @@ def get_fullname(message: Message) -> str:
     return name.strip().title()
 
 
-def reform(word: str, number: int) -> str:
-    word_form = morph.parse(word)[0]
-    return word_form.make_agree_with_number(number).word
+def reform(word: str, main_word: Union[int, str]) -> str:
+    word_form: pymorphy2.analyzer.Parse = morph.parse(word)[0]
+    if isinstance(main_word, int):
+        return word_form.make_agree_with_number(main_word).word
+    return word_form.word
 
 
 def make_empty_message(chat_id: Union[str, int]) -> Message:

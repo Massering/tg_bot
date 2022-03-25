@@ -1,13 +1,38 @@
 {
+    "512208533": {
+        "class": "Бета",
+        "name": "Рикардо Милос",
+        "data": null,
+        "school_visit": null,
+        "reason": null
+    },
     "857893046": {
         "class": "Йота",
         "name": "Чжун Ли",
-        "data": true
+        "data": true,
+        "school_visit": null,
+        "reason": null
+    },
+    "963904357": {
+        "class": "Лямбда",
+        "name": "Арина",
+        "data": false,
+        "school_visit": true,
+        "reason": null
     },
     "1089524173": {
-        "class": "Каппа",
-        "name": "Рудаков Максим",
-        "data": true
+        "class": "Йота",
+        "name": "Максимка",
+        "data": false,
+        "school_visit": true,
+        "reason": "Каникулы"
+    },
+    "1165152297": {
+        "class": "Йота",
+        "name": "ЫльяЗ",
+        "data": false,
+        "school_visit": false,
+        "reason": "Во второй день \"Вектора в будущее\" ребята будут выступать со своими работами. Это оч скушно. Лучше физику порешаю"
     },
     "deleted": {
         "1089524173": {

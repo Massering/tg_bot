@@ -17,23 +17,31 @@ if not os.path.exists(USERS):
 users = json.load(open(USERS, 'r', encoding=ENCODING))
 users = {i[0] if i[0] == DELETED else int(i[0]): i[1] for i in users.items()}
 
-recording_data = {}
-
 bot = telebot.TeleBot(TOKEN)
 
 
 def send_message(user_id, text, *args, **kwargs):
-    log((text, user_id))
+    log((text.strip(), user_id))
+    if isinstance(user_id, str):
+        user_id = eval(user_id)
     bot.send_message(user_id, text, *args, **kwargs)
 
 
 def send_message_by_input():
+    last_id, user_id, text = [None] * 3
     while 1:
         try:
             user_id, *text = input().split()
             send_message(user_id, ' '.join(text))
+            last_id = user_id
+        except (telebot.apihelper.ApiException, NameError):
+            if last_id:
+                try:
+                    send_message(last_id, ' '.join([user_id] + text))
+                except Exception as error:
+                    log(f'Лох, как ты смог допустить ошибку "{error}"')
         except Exception as error:
-            log(f'Лох, как ты смог допустить ошибку "{error}"')
+            log(f'Лох, как ты смог допустить ошибку "{error.__class__} - {error}"')
 
 
 def log(message, starting=False):
@@ -44,6 +52,10 @@ def log(message, starting=False):
         name += f' (id {message.from_user.id})'
         print(f'{get_date()} - {name}: "{message.text}"')
 
+        if message.text == '/exit':
+            send_message(message.from_user.id, f'Выход из сценария')
+            return 1
+
         if message.text[0] == '/' and not starting:
             start(message)
             return 1
@@ -53,9 +65,6 @@ def log(message, starting=False):
 
     else:
         print(f'{get_date()} - system_log: "{message}"')
-
-    if recording_data:
-        print('recording_data:', json.dumps(recording_data, indent=2))
 
 
 @bot.message_handler(content_types=['text'])
@@ -81,7 +90,8 @@ def start(message: Message):
         send_message(message.from_user.id, bot.get_my_commands() or 'Nothing')
 
     elif message.text == '/change_name':
-        send_message(message.from_user.id, 'Введи новое имя',
+        send_message(message.from_user.id, 'Введи новое имя. Имей в виду, что твой классный советник '
+                                           'будет уведомлен об изменении имени (/exit если вдруг передумал)',
                      reply_markup=make_keyboard({get_fullname(message), users[message.from_user.id][NAME]}))
         bot.register_next_step_handler(message, change_name)
 
@@ -117,7 +127,10 @@ def change_name(message: Message):
     if log(message):
         return
 
-    send_message(message.from_user.id, f'Имя {users[message.from_user.id][NAME]} изменено на {message.text}')
+    user = users[message.from_user.id]
+    send_message(message.from_user.id, f'Имя {user[NAME]} изменено на {message.text}')
+    send_message(CLASSES[user[CLASS]], f'Имя ученика {user[NAME]} изменено на {message.text}')
+
     users[message.from_user.id][NAME] = message.text
     dump(users, USERS)
 
@@ -179,7 +192,7 @@ def get_at_school(message: Message):
         users[message.from_user.id][VISIT] = False
         dump(users, USERS)
 
-        send_message(message.from_user.id, 'Пожалуйста, укажи причину.')
+        send_message(message.from_user.id, 'Пожалуйста, укажи причину для твоего классного советника.')
         bot.register_next_step_handler(message, get_no_school_reason)
 
     else:
@@ -272,7 +285,7 @@ def register_end(message: Message, name, class_letter):
         send_message(message.from_user.id, 'Ты успешно зарегистрирован!')
 
         try:
-            send_message(CLASSES[class_letter], f'Ученик с id {message.from_user.id}, назвавшийся {name}, '
+            send_message(CLASSES[class_letter], f'Ученик с id {message.from_user.id}, назвавшийся "{name}", '
                                                 f'присоединился к вашему классу. Если это не ваш ученик, пожалуйста, '
                                                 f'сообщите данные этого пользователя администратору @chmorodinka')
         except telebot.apihelper.ApiException:
@@ -288,8 +301,8 @@ def register_end(message: Message, name, class_letter):
 
 def send_notification():
     log('send_notification are called by schedule')
-    for user_id in list(users.keys())[-1:]:
-        if users[user_id][DATA] is None:
+    for user_id in users:
+        if users[user_id].get(DATA, False) is None:
             log(f'Отправка сообщения id{user_id} ({users[user_id][NAME]})')
 
             try:
@@ -310,7 +323,7 @@ def send_notification():
 def send_report(clear=True):
     log('send_report are called' + ' by schedule' * clear)
     for let in CLASSES:
-        cur_class = list(filter(lambda x: x[CLASS] == let, users.values()))
+        cur_class = list(filter(lambda x: x.get(CLASS) == let, users.values()))
 
         text = no_data = lunch = no_lunch = no_school = ''
         k = [0] * 3
@@ -391,7 +404,7 @@ def run_schedule():
         try:
             schedule.run_pending()
         except Exception as error:
-            log('schedule error - ' + str(error))
+            log('schedule error - ' + str(error.__class__) + ' ' + str(error))
         # schedule.idle_seconds()
         sleep(1)
 
@@ -407,16 +420,15 @@ if __name__ == "__main__":
         try:
             if log_text:
                 send_message(MAKSIM, log_text)
-            bot.polling(none_stop=True, interval=0)
+            bot.polling(non_stop=True, skip_pending=True)
         except Exception as log_error:
-            log_text = f'({log_error.__class__}, {log_error.__cause__}): {log_error}'
-            log_text = f'{get_date()} - ' + log_text
-            log(log_text)
             if isinstance(log_error, (requests.exceptions.ConnectionError,
                                       requests.exceptions.ReadTimeout,
                                       requests.exceptions.ConnectionError)):
                 print('That annoying errors erroring again')
                 log_text = None
             else:
+                log_text = f'{get_date()} - ' + f'({log_error.__class__}, {log_error.__cause__}): {log_error}'
+                log(log_text)
                 open(LOGS, 'a', encoding=ENCODING).write(log_text + '\n')
             sleep(5)
