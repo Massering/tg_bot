@@ -15,16 +15,17 @@ if not os.path.exists(USERS):
     dump({DELETED: {}}, USERS)
     # raise FileNotFoundError(f'ФАЙЛ {USERS} НЕ СУЩЕСТВУЕТ')
 users = json.load(open(USERS, 'r', encoding=ENCODING))
-users = {i[0] if i[0] == DELETED else int(i[0]): i[1] for i in users.items()}
+users = {i if i == DELETED else int(i): users[i] for i in users}
+users[DELETED] = {int(i): users[DELETED][i] for i in users[DELETED]}
 
 bot = telebot.TeleBot(TOKEN)
 
 
-def send_message(user_id, text, *args, **kwargs):
+def send_message(user_id: Union[int, str], text: str, *args, reply_markup=None, **kwargs):
     log((text.strip(), user_id))
     if isinstance(user_id, str):
         user_id = eval(user_id)
-    bot.send_message(user_id, text, *args, **kwargs)
+    bot.send_message(user_id, text, *args, reply_markup=reply_markup, **kwargs)
 
 
 def send_message_by_input():
@@ -74,8 +75,14 @@ def start(message: Message):
         return
 
     if message.text == '/start':
-        send_message(message.from_user.id, '''
+        send_message(message.from_user.id, f'''
 Это бот ФМШ СФУ, созданный, чтобы опрашивать учеников, будут ли они обедать
+
+Данные записываются на ближайший учебный день. Данные можно изменить только до {REPORT_TIME} того же дня.
+В {REPORT_TIME} бот отправляет классному советнику всю информацию.
+После этого времени бот будет спрашивать данные на следующий учебный день.
+
+Также бот отправит вам напоминание в {EVENING_TIME} и в {MORNING_TIME}, если вы до сих пор не внесли данные
 
 Создатель: Рудаков Максим из Йоты
 @chmorodinka
@@ -100,10 +107,26 @@ def start(message: Message):
                      reply_markup=make_bool_keyboard())
         bot.register_next_step_handler(message, del_user)
 
+    elif message.text == '/send_message':
+        send_message(message.from_user.id, 'Первое слово следующего сообщения будет использовано как id, а '
+                                           'остальные отправлены как текст.')
+        bot.register_next_step_handler(message, send_message_by_id)
+
     else:
         send_message(message.from_user.id, f'Хочешь изменить данные на {get_planning_day(need_date=False)}?',
                      reply_markup=make_bool_keyboard())
         bot.register_next_step_handler(message, get_if_want_to_change_data)
+
+
+def send_message_by_id(message: Message):
+    try:
+        user_id, *text = input().split()
+        send_message(user_id, ' '.join(text))
+
+        send_message(message.from_user.id, f'Отправлено to id{user_id} "{" ".join(text)}"')
+
+    except Exception as error:
+        send_message(message.from_user.id, f'Лох, как ты смог допустить ошибку "{error.__class__} - {error}"')
 
 
 def del_user(message: Message):
@@ -112,7 +135,7 @@ def del_user(message: Message):
         return
 
     if message.text.lower() == 'да':
-        users[DELETED][message.from_user.id] = users[message.from_user.id].copy()
+        users[DELETED][message.from_user.id] = users[message.from_user.id]
         del users[message.from_user.id]
         dump(users, USERS)
 
@@ -192,7 +215,8 @@ def get_at_school(message: Message):
         users[message.from_user.id][VISIT] = False
         dump(users, USERS)
 
-        send_message(message.from_user.id, 'Пожалуйста, укажи причину для твоего классного советника.')
+        send_message(message.from_user.id, 'Пожалуйста, укажи причину для твоего классного советника.',
+                     reply_markup=make_keyboard([users[message.from_user.id][REASON] or '']))
         bot.register_next_step_handler(message, get_no_school_reason)
 
     else:
@@ -239,7 +263,7 @@ def register(message: Message):
 
     if current_class not in CLASSES:
         send_message(user_id, 'Нет такого класса',
-                     reply_markup=make_bool_keyboard())
+                     reply_markup=make_keyboard(CLASSES))
         bot.register_next_step_handler(message, register)
         return
 
@@ -287,7 +311,7 @@ def register_end(message: Message, name, class_letter):
         try:
             send_message(CLASSES[class_letter], f'Ученик с id {message.from_user.id}, назвавшийся "{name}", '
                                                 f'присоединился к вашему классу. Если это не ваш ученик, пожалуйста, '
-                                                f'сообщите данные этого пользователя администратору @chmorodinka')
+                                                f'сообщите имя и id этого пользователя администратору @chmorodinka')
         except telebot.apihelper.ApiException:
             log(f'Классный советник класса {class_letter} не зарегистрирован!')
 
@@ -338,10 +362,10 @@ def send_report(clear=True):
                 no_lunch += student[NAME] + '\n'
                 k[1] += 1
             else:
-                no_school += f'{student[NAME]}: "{student[REASON]}"\n'
+                no_school += f'{student[NAME]}: "{student[REASON] or "Причина не была указана."}"\n'
                 k[2] += 1
             if clear:
-                student[DATA] = student[VISIT] = student[REASON] = None
+                student[DATA] = student[VISIT] = None
 
         if lunch:
             text += f"В {get_planning_day()} {reform('будет', k[0])} обедать {k[0]} " \
@@ -425,7 +449,7 @@ if __name__ == "__main__":
             if isinstance(log_error, (requests.exceptions.ConnectionError,
                                       requests.exceptions.ReadTimeout,
                                       requests.exceptions.ConnectionError)):
-                print('That annoying errors erroring again')
+                log('That annoying errors erroring again')
                 log_text = None
             else:
                 log_text = f'{get_date()} - ' + f'({log_error.__class__}, {log_error.__cause__}): {log_error}'

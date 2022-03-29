@@ -21,7 +21,7 @@ def get_planning_day(need_date=True) -> str:
     weekdays = ['понедельник', 'вторник', 'среду', 'четверг', 'пятницу', 'субботу', 'воскресенье']
 
     now = dt.now()
-    delta = now > now.replace(**dict(zip(['hour', 'minute'], map(int, MORNING_TIME.split(':')))))
+    delta = now > now.replace(**dict(zip(['hour', 'minute'], map(int, REPORT_TIME.split(':')))))
     delta += now.weekday() == 6 - delta
 
     date = now + td(days=delta)

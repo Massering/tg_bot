@@ -11,8 +11,8 @@ CLASSES = {
     'Дзета': MAKSIM,
     'Эта': MAKSIM,
     'Тета': MAKSIM,
-    'Йота': MAKSIM,
-    'Каппа': MAKSIM,    # SOPHIA 0
+    'Йота': 812263756,
+    'Каппа': MAKSIM,
     'Лямбда': MAKSIM
 }
 # Время утренних напоминаний
