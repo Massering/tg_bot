@@ -88,7 +88,23 @@ def start(message: Message):
 @chmorodinka
 ''')
 
-    if message.from_user.id not in users:
+    if message.from_user.id in CLASSES.values():
+        *_, cur_class = sorted(i[0] for i in CLASSES.items() if i[1] == message.from_user.id)
+        print(cur_class)
+
+        if message.text == '/my_class':
+            text = 'Список учеников вашего класса:\n'
+            for n, student in enumerate(x for x in users if x != DELETED and users[x][CLASS] == cur_class):
+                text += f'{n + 1}. {users[student][NAME]} (id{student})'
+            send_message(message.from_user.id, text)
+
+        elif message.text == '/report':
+            send_report(clear=False, classes=[cur_class])
+
+        else:
+            send_message(message.from_user.id, TEACHER_COMMANDS)
+
+    elif message.from_user.id not in users:
         send_message(message.from_user.id, 'Хочешь зарегистрироваться?',
                      reply_markup=make_bool_keyboard())
         bot.register_next_step_handler(message, if_register)
@@ -120,7 +136,7 @@ def start(message: Message):
 
 def send_message_by_id(message: Message):
     try:
-        user_id, *text = input().split()
+        user_id, *text = message.text.split()
         send_message(user_id, ' '.join(text))
 
         send_message(message.from_user.id, f'Отправлено to id{user_id} "{" ".join(text)}"')
@@ -164,6 +180,9 @@ def get_if_want_to_change_data(message: Message):
         return
 
     if message.text.lower() == 'да':
+        if message.from_user.id in [1998062038, 1344741369]:
+            send_message(message.from_user.id, 'Пизда')
+
         ask_data(message)
     else:
         send_message(message.from_user.id, 'Нет так нет')
@@ -185,7 +204,10 @@ def get_data(message: Message):
         users[message.from_user.id][DATA] = True
         dump(users, USERS)
 
-        send_message(message.from_user.id, 'Записано!')
+        if message.from_user.id in [1998062038, 1344741369]:
+            send_message(message.from_user.id, 'Пизда')
+        else:
+            send_message(message.from_user.id, 'Записано!')
 
     elif message.text.lower() == 'нет':
         users[message.from_user.id][DATA] = False
@@ -344,9 +366,9 @@ def send_notification():
                     log(error)
 
 
-def send_report(clear=True):
-    log('send_report are called' + ' by schedule' * clear)
-    for let in CLASSES:
+def send_report(clear=True, classes=CLASSES):
+    log('send_report are called' + ' by schedule')
+    for let in classes:
         cur_class = list(filter(lambda x: x.get(CLASS) == let, users.values()))
 
         text = no_data = lunch = no_lunch = no_school = ''
