@@ -35,7 +35,7 @@ def send_message_by_input():
             user_id, *text = input().split()
             send_message(user_id, ' '.join(text))
             last_id = user_id
-        except (telebot.apihelper.ApiException, NameError):
+        except (telebot.apihelper.ApiException, NameError):   # Пользователя не существует
             if last_id:
                 try:
                     send_message(last_id, ' '.join([user_id] + text))
@@ -84,13 +84,19 @@ def start(message: Message):
 
 Также бот отправит вам напоминание в {EVENING_TIME} и в {MORNING_TIME}, если вы до сих пор не внесли данные
 
+Если вы классный советник, напишите "Я классный советник" и больше ничего не пишите, вам не нужно регистрироваться
+
 Создатель: Рудаков Максим из Йоты
 @chmorodinka
 ''')
 
-    if message.from_user.id in CLASSES.values():
+    if message.text == '/send_message':
+        send_message(message.from_user.id, 'Первое слово следующего сообщения будет использовано как id, а '
+                                           'остальные отправлены как текст.')
+        bot.register_next_step_handler(message, send_message_by_id)
+
+    elif message.from_user.id in CLASSES.values():
         *_, cur_class = sorted(i[0] for i in CLASSES.items() if i[1] == message.from_user.id)
-        print(cur_class)
 
         if message.text == '/my_class':
             text = 'Список учеников вашего класса:\n'
@@ -123,11 +129,6 @@ def start(message: Message):
                      reply_markup=make_bool_keyboard())
         bot.register_next_step_handler(message, del_user)
 
-    elif message.text == '/send_message':
-        send_message(message.from_user.id, 'Первое слово следующего сообщения будет использовано как id, а '
-                                           'остальные отправлены как текст.')
-        bot.register_next_step_handler(message, send_message_by_id)
-
     else:
         send_message(message.from_user.id, f'Хочешь изменить данные на {get_planning_day(need_date=False)}?',
                      reply_markup=make_bool_keyboard())
@@ -137,7 +138,11 @@ def start(message: Message):
 def send_message_by_id(message: Message):
     try:
         user_id, *text = message.text.split()
-        send_message(user_id, ' '.join(text))
+
+        if message.from_user.id == MAKSIM:
+            send_message(user_id, ' '.join(text))
+        else:
+            send_message(user_id, f'id{message.from_user.id}: \n{" ".join(text)}')
 
         send_message(message.from_user.id, f'Отправлено to id{user_id} "{" ".join(text)}"')
 
@@ -180,7 +185,7 @@ def get_if_want_to_change_data(message: Message):
         return
 
     if message.text.lower() == 'да':
-        if message.from_user.id in [1998062038, 1344741369]:
+        if message.from_user.id in GIRLS:
             send_message(message.from_user.id, 'Пизда')
 
         ask_data(message)
@@ -204,7 +209,7 @@ def get_data(message: Message):
         users[message.from_user.id][DATA] = True
         dump(users, USERS)
 
-        if message.from_user.id in [1998062038, 1344741369]:
+        if message.from_user.id in GIRLS:
             send_message(message.from_user.id, 'Пизда')
         else:
             send_message(message.from_user.id, 'Записано!')
@@ -474,7 +479,8 @@ if __name__ == "__main__":
                 log('That annoying errors erroring again')
                 log_text = None
             else:
-                log_text = f'{get_date()} - ' + f'({log_error.__class__}, {log_error.__cause__}): {log_error}'
+                log_text = f'({log_error.__class__}, {log_error.__cause__}): {log_error}'
                 log(log_text)
+                log_text = f'{get_date()} - ' + log_text
                 open(LOGS, 'a', encoding=ENCODING).write(log_text + '\n')
             sleep(5)

@@ -2,13 +2,14 @@
     "400435224": {
         "class": "Йота",
         "name": "Кишкин Алексей",
-        "data": true
+        "data": null,
+        "school_visit": null
     },
     "408045956": {
         "class": "Йота",
         "name": "Соловьев Игорь",
-        "data": false,
-        "school_visit": true
+        "data": null,
+        "school_visit": null
     },
     "512208533": {
         "class": "Бета",
@@ -20,86 +21,106 @@
     "519905246": {
         "class": "Йота",
         "name": "Мухомедьянова Тома",
-        "data": true
+        "data": null,
+        "school_visit": null
     },
     "603377678": {
         "class": "Йота",
         "name": "Vadim",
-        "data": true
+        "data": null,
+        "school_visit": null
     },
     "700026795": {
         "class": "Йота",
         "name": "Кеммерер Сергей",
-        "data": true
+        "data": null,
+        "school_visit": null
     },
     "963904357": {
         "class": "Эта",
         "name": "Арина",
-        "data": null,
-        "school_visit": null,
-        "reason": null
+        "data": false,
+        "school_visit": false,
+        "reason": "завтра лето"
     },
     "979923466": {
         "class": "Йота",
         "name": "Совкова София",
-        "data": true
+        "data": true,
+        "school_visit": null
     },
     "1061139622": {
         "class": "Йота",
         "name": "Марьясов Владимир",
-        "data": true
+        "data": null,
+        "school_visit": null
     },
     "1069934389": {
         "class": "Йота",
         "name": "Постоева Анастасия",
-        "data": true
+        "data": null,
+        "school_visit": null
     },
     "1089524173": {
         "class": "Йота",
         "name": "Рудаков Максим",
-        "data": null
+        "data": true,
+        "school_visit": null
     },
     "1165152297": {
         "class": "Йота",
         "name": "ЫльяЗ",
-        "data": true,
+        "data": null,
         "school_visit": null,
         "reason": null
     },
     "1165447922": {
         "class": "Йота",
         "name": "Бухтоярова 🐾 Анастасия",
-        "data": true
+        "data": null,
+        "school_visit": null
+    },
+    "1263832945": {
+        "class": "Эта",
+        "name": "Ника",
+        "data": true,
+        "school_visit": true
     },
     "1344741369": {
         "class": "Йота",
         "name": "Иванцова Аня",
-        "data": null
+        "data": null,
+        "school_visit": null
     },
     "1430032907": {
         "class": "Йота",
         "name": "Барон Владислав",
-        "data": true
+        "data": null,
+        "school_visit": null
     },
     "1831580928": {
         "class": "Йота",
         "name": "Шкредов Сергей",
-        "data": true
+        "data": null,
+        "school_visit": null
     },
     "1883271571": {
         "class": "Йота",
         "name": "Муковозчик Артём",
-        "data": true
+        "data": null,
+        "school_visit": null
     },
     "1987908012": {
         "class": "Йота",
         "name": "Яковлев Демьян",
-        "data": true
+        "data": null,
+        "school_visit": null
     },
     "1998062038": {
         "class": "Йота",
         "name": "Юргельян Нина",
-        "data": true
+        "data": null,
+        "school_visit": null
     },
     "deleted": {}
 }

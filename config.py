@@ -30,7 +30,7 @@ COMMANDS = '''
 TEACHER_COMMANDS = '''
 Список действий классных советников:
 /my_class - получить список учеников моего класса
-/report - получить информацию вневременно, данные не очистятся
+/report - получить информацию вневременно
 '''
 
 USERS = 'users.json'
@@ -46,8 +46,4 @@ REASON = 'reason'
 
 DELETED = 'deleted'
 
-RUS = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
-ENG = 'abcdefghijklmnopqrstuvwxyz'
-DIGITS = '1234567890'
-PUNCTUATION = ' -.,()/+_\n'
-ALLOWED_SIMBOLS = DIGITS + ENG + ENG.upper() + RUS + RUS.upper() + PUNCTUATION
+GIRLS = [1998062038, 1344741369, 1263832945]
