@@ -64,13 +64,13 @@
     "1089524173": {
         "class": "Йота",
         "name": "Рудаков Максим",
-        "data": true,
+        "data": null,
         "school_visit": null
     },
     "1165152297": {
         "class": "Йота",
         "name": "ЫльяЗ",
-        "data": null,
+        "data": true,
         "school_visit": null,
         "reason": null
     },

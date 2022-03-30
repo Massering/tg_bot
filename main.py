@@ -21,11 +21,12 @@ users[DELETED] = {int(i): users[DELETED][i] for i in users[DELETED]}
 bot = telebot.TeleBot(TOKEN)
 
 
-def send_message(user_id: Union[int, str], text: str, *args, reply_markup=None, **kwargs):
-    log((text.strip(), user_id))
+def send_message(user_id: Union[int, str], text: str, reply_markup=None):
+    text = str(text).strip()
+    log((text, user_id))
     if isinstance(user_id, str):
         user_id = eval(user_id)
-    bot.send_message(user_id, text, *args, reply_markup=reply_markup, **kwargs)
+    bot.send_message(user_id, text, reply_markup=reply_markup)
 
 
 def send_message_by_input():
@@ -35,7 +36,7 @@ def send_message_by_input():
             user_id, *text = input().split()
             send_message(user_id, ' '.join(text))
             last_id = user_id
-        except (telebot.apihelper.ApiException, NameError):   # Пользователя не существует
+        except (telebot.apihelper.ApiException, NameError, SyntaxError):  # Пользователя не существует
             if last_id:
                 try:
                     send_message(last_id, ' '.join([user_id] + text))
@@ -74,8 +75,10 @@ def start(message: Message):
     if log(message, starting=True):
         return
 
+    user_id = message.from_user.id
+
     if message.text == '/start':
-        send_message(message.from_user.id, f'''
+        send_message(user_id, f'''
 Это бот ФМШ СФУ, созданный, чтобы опрашивать учеников, будут ли они обедать
 
 Данные записываются на ближайший учебный день. Данные можно изменить только до {REPORT_TIME} того же дня.
@@ -91,46 +94,47 @@ def start(message: Message):
 ''')
 
     if message.text == '/send_message':
-        send_message(message.from_user.id, 'Первое слово следующего сообщения будет использовано как id, а '
-                                           'остальные отправлены как текст.')
+        send_message(user_id, 'Первое слово следующего сообщения будет использовано как id, а '
+                              'остальные отправлены как текст.')
         bot.register_next_step_handler(message, send_message_by_id)
 
-    elif message.from_user.id in CLASSES.values():
-        *_, cur_class = sorted(i[0] for i in CLASSES.items() if i[1] == message.from_user.id)
+    elif message.text.lower() in ['/menu', 'меню', '/commands', 'команды']:
+        send_message(user_id, '\n'.join(map(str, bot.get_my_commands())) or 'Nothing')
+
+    elif user_id in CLASSES.values():
+        *_, cur_class = sorted(i[0] for i in CLASSES.items() if i[1] == user_id)
 
         if message.text == '/my_class':
             text = 'Список учеников вашего класса:\n'
             for n, student in enumerate(x for x in users if x != DELETED and users[x][CLASS] == cur_class):
                 text += f'{n + 1}. {users[student][NAME]} (id{student})'
-            send_message(message.from_user.id, text)
+            send_message(user_id, text)
 
         elif message.text == '/report':
             send_report(clear=False, classes=[cur_class])
 
         else:
-            send_message(message.from_user.id, TEACHER_COMMANDS)
+            send_message(user_id, TEACHER_COMMANDS)
 
-    elif message.from_user.id not in users:
-        send_message(message.from_user.id, 'Хочешь зарегистрироваться?',
+    elif user_id not in users:
+        send_message(user_id, 'Хочешь зарегистрироваться?',
                      reply_markup=make_bool_keyboard())
         bot.register_next_step_handler(message, if_register)
 
-    elif message.text.lower() in ['/menu', 'меню', '/commands', 'команды']:
-        send_message(message.from_user.id, bot.get_my_commands() or 'Nothing')
-
     elif message.text == '/change_name':
-        send_message(message.from_user.id, 'Введи новое имя. Имей в виду, что твой классный советник '
-                                           'будет уведомлен об изменении имени (/exit если вдруг передумал)',
-                     reply_markup=make_keyboard({get_fullname(message), users[message.from_user.id][NAME]}))
+        send_message(user_id, 'Введи новое имя. Имей в виду, что твой классный советник '
+                              'будет уведомлен об изменении имени (/exit если вдруг передумал)',
+                     reply_markup=make_keyboard({get_fullname(message), users[user_id][NAME]}))
         bot.register_next_step_handler(message, change_name)
 
     elif message.text == '/del_myself':
-        send_message(message.from_user.id, 'Ты уверен, что хочешь удалить свои данные из системы?',
+        send_message(user_id, 'Ты уверен, что хочешь удалить свои данные из системы?',
                      reply_markup=make_bool_keyboard())
         bot.register_next_step_handler(message, del_user)
 
     else:
-        send_message(message.from_user.id, f'Хочешь изменить данные на {get_planning_day(need_date=False)}?',
+        send_message(user_id, f'Хочешь {"внести" * (users[user_id][DATA] is None) or "изменить"}'
+                              f' данные на {get_planning_day(need_date=False)}?',
                      reply_markup=make_bool_keyboard())
         bot.register_next_step_handler(message, get_if_want_to_change_data)
 

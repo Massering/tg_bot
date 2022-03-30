@@ -5,3 +5,6 @@
 22.03.29 23:14:32 - (<class 'TypeError'>, None): 'int' object is not subscriptable
 22.03.30 10:54:23 - (<class 'telebot.apihelper.ApiTelegramException'>, None): A request to the Telegram API was unsuccessful. Error code: 409. Description: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
 22.03.30 10:54:32 - (<class 'telebot.apihelper.ApiTelegramException'>, None): A request to the Telegram API was unsuccessful. Error code: 409. Description: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+22.03.30 17:37:35 - (<class 'AttributeError'>, None): 'list' object has no attribute 'strip'
+22.03.30 17:38:51 - (<class 'AttributeError'>, None): 'map' object has no attribute 'strip'
+22.03.30 18:28:05 - (<class 'TypeError'>, None): can't multiply sequence by non-int of type 'NoneType'
