@@ -55,7 +55,7 @@ def log(message, starting=False):
         print(f'{get_date()} - {name}: "{message.text}"')
 
         if message.text == '/exit':
-            send_message(message.from_user.id, f'Выход из сценария')
+            send_message(message.from_user.id, 'Выход из сценария')
             return 1
 
         if message.text[0] == '/' and not starting:
@@ -133,13 +133,16 @@ def start(message: Message):
         bot.register_next_step_handler(message, del_user)
 
     else:
-        send_message(user_id, f'Хочешь {"внести" * (users[user_id][DATA] is None) or "изменить"}'
-                              f' данные на {get_planning_day(need_date=False)}?',
+        send_message(user_id, f'Хочешь {"записать" * (users[user_id][DATA] is None) or "изменить"}'
+                              f' данные {get_planning_day(need_date=False, na=True)}?',
                      reply_markup=make_bool_keyboard())
         bot.register_next_step_handler(message, get_if_want_to_change_data)
 
 
 def send_message_by_id(message: Message):
+    if log(message):
+        return
+
     try:
         user_id, *text = message.text.split()
 
@@ -199,7 +202,7 @@ def get_if_want_to_change_data(message: Message):
 
 def ask_data(message: Message):
     """Спрашивает пользователя, собирается ли он обедать в ближайший день"""
-    send_message(message.from_user.id, f'Ты будешь обедать в {get_planning_day()}?',
+    send_message(message.from_user.id, f'Ты будешь обедать {get_planning_day()}?',
                  reply_markup=make_bool_keyboard())
     bot.register_next_step_handler(message, get_data)
 
@@ -215,13 +218,10 @@ def get_data(message: Message):
 
         if message.from_user.id in GIRLS:
             send_message(message.from_user.id, 'Пизда')
-        else:
-            send_message(message.from_user.id, 'Записано!')
+
+        send_message(message.from_user.id, 'Записано!')
 
     elif message.text.lower() == 'нет':
-        users[message.from_user.id][DATA] = False
-        dump(users, USERS)
-
         send_message(message.from_user.id, 'А в школу пойдешь?', reply_markup=make_bool_keyboard())
         bot.register_next_step_handler(message, get_at_school)
 
@@ -243,6 +243,7 @@ def get_at_school(message: Message):
         send_message(message.from_user.id, 'Записано!')
 
     elif message.text.lower() == 'нет':
+        users[message.from_user.id][DATA] = False
         users[message.from_user.id][VISIT] = False
         dump(users, USERS)
 
@@ -328,7 +329,9 @@ def register_end(message: Message, name, class_letter):
         users[message.from_user.id] = {
             CLASS: class_letter,
             NAME: name,
-            DATA: None
+            DATA: None,
+            VISIT: None,
+            REASON: None
         }
 
         if message.from_user.id in users[DELETED]:
@@ -346,7 +349,7 @@ def register_end(message: Message, name, class_letter):
         except telebot.apihelper.ApiException:
             log(f'Классный советник класса {class_letter} не зарегистрирован!')
 
-        send_message(message.from_user.id, 'Хочешь сразу внести данные?',
+        send_message(message.from_user.id, f'Хочешь сразу записать данные {get_planning_day(na=True)}?',
                      reply_markup=make_bool_keyboard())
         bot.register_next_step_handler(message, get_if_want_to_change_data)
 
@@ -354,12 +357,16 @@ def register_end(message: Message, name, class_letter):
         send_message(message.from_user.id, 'Регистрация отменена')
 
 
-def send_notification():
-    log('send_notification are called by schedule')
+def send_notification(morning=False):
+    log('send_notification was called')
+
+    # if morning and dt.now().date() != get_planning_day(formatted=False) or \
+    #         not morning and (dt.now() + td(days=1)).date() != get_planning_day(formatted=False):
+    #     log('send_notification was aborted')
+    #     return
+
     for user_id in users:
         if users[user_id].get(DATA, False) is None:
-            log(f'Отправка сообщения id{user_id} ({users[user_id][NAME]})')
-
             try:
                 ask_data(make_empty_message(user_id))
 
@@ -376,7 +383,12 @@ def send_notification():
 
 
 def send_report(clear=True, classes=CLASSES):
-    log('send_report are called' + ' by schedule')
+    log('send_report was called' + ' by schedule')
+
+    if len(classes) > 1 and dt.now().date() != get_planning_day(formatted=False):
+        log('send_report was aborted')
+        return
+
     for let in classes:
         cur_class = list(filter(lambda x: x.get(CLASS) == let, users.values()))
 
@@ -399,11 +411,11 @@ def send_report(clear=True, classes=CLASSES):
                 student[DATA] = student[VISIT] = None
 
         if lunch:
-            text += f"В {get_planning_day()} {reform('будет', k[0])} обедать {k[0]} " \
+            text += f"{get_planning_day().capitalize()} {reform('будет', k[0])} обедать {k[0]} " \
                     f"{reform('ученик', k[0])} класса {let}:\n"
             text += lunch
         else:
-            text += f"В {get_planning_day()} ни один ученик класса {let} не будет обедать.\n"
+            text += f"{get_planning_day().capitalize()} ни один ученик класса {let} не будет обедать.\n"
 
         if no_lunch:
             text += f"\nНе {reform('будет', k[1])} обедать, но " \
@@ -427,32 +439,9 @@ def send_report(clear=True, classes=CLASSES):
 def run_schedule():
     schedule.every().day.at(MORNING_TIME).do(send_message, SOPHIA, 'Доброе утро, зайка, удачного дня💕')
 
-    # Понедельник
-    schedule.every().monday.at(MORNING_TIME).do(send_notification)
-    schedule.every().monday.at(REPORT_TIME).do(send_report)
-    schedule.every().monday.at(EVENING_TIME).do(send_notification)
-    # Вторник
-    schedule.every().tuesday.at(MORNING_TIME).do(send_notification)
-    schedule.every().tuesday.at(REPORT_TIME).do(send_report)
-    schedule.every().tuesday.at(EVENING_TIME).do(send_notification)
-    # Среда
-    schedule.every().wednesday.at(MORNING_TIME).do(send_notification)
-    schedule.every().wednesday.at(REPORT_TIME).do(send_report)
-    schedule.every().wednesday.at(EVENING_TIME).do(send_notification)
-    # Четверг
-    schedule.every().thursday.at(MORNING_TIME).do(send_notification)
-    schedule.every().thursday.at(REPORT_TIME).do(send_report)
-    schedule.every().thursday.at(EVENING_TIME).do(send_notification)
-    # Пятница
-    schedule.every().friday.at(MORNING_TIME).do(send_notification)
-    schedule.every().friday.at(REPORT_TIME).do(send_report)
-    schedule.every().friday.at(EVENING_TIME).do(send_notification)
-
-    # Суббота
-    schedule.every().saturday.at(MORNING_TIME).do(send_notification)
-    schedule.every().saturday.at(REPORT_TIME).do(send_report)
-    # Воскресенье
-    schedule.every().sunday.at(EVENING_TIME).do(send_notification)
+    schedule.every().day.at(MORNING_TIME).do(send_notification, morning=True)
+    schedule.every().day.at(REPORT_TIME).do(send_report)
+    schedule.every().day.at(EVENING_TIME).do(send_notification)
 
     log('Schedule started')
     while 1:

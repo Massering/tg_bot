@@ -8,3 +8,4 @@
 22.03.30 17:37:35 - (<class 'AttributeError'>, None): 'list' object has no attribute 'strip'
 22.03.30 17:38:51 - (<class 'AttributeError'>, None): 'map' object has no attribute 'strip'
 22.03.30 18:28:05 - (<class 'TypeError'>, None): can't multiply sequence by non-int of type 'NoneType'
+22.03.31 17:01:10 - (<class 'KeyError'>, None): 'reason'

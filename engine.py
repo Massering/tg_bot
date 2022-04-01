@@ -1,6 +1,6 @@
 from telebot.types import *
 from random import choice
-from datetime import datetime as dt, timedelta as td
+from datetime import datetime as dt, timedelta as td, date
 import pymorphy2
 
 from config import *
@@ -13,15 +13,18 @@ def get_date() -> str:
     return dt.now().strftime("%y.%m.%d %H:%M:%S")
 
 
-def get_planning_day(formatted=True, need_date=True) -> Union[str, dt]:
+def get_planning_day(formatted=True, need_date=True, na=False) -> Union[str, date]:
     """Получение строки с датой и временем, на которые будут записаны данные"""
 
     months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля',
               'августа', 'сентября', 'октября', 'ноября', 'декабря']
-    weekdays = ['понедельник', 'вторник', 'среду', 'четверг', 'пятницу', 'субботу', 'воскресенье']
+    v_weekdays = ['в понедельник', 'во вторник', 'в среду', 'в четверг',
+                  'в пятницу', 'в субботу', 'в воскресенье', 'сегодня', 'завтра']
+    na_weekdays = ['на понедельник', 'на вторник', 'на среду', 'на четверг',
+                   'на пятницу', 'на субботу', 'на воскресенье', 'на сегодня', 'на завтра']
 
     now = dt.now()
-    delta = now >= now.replace(**dict(zip(['hour', 'minute'], map(int, REPORT_TIME.split(':')))))
+    delta = now > now.replace(**dict(zip(['hour', 'minute'], map(int, REPORT_TIME.split(':')))))
     delta += now.weekday() == 6 - delta
 
     while (now + td(days=delta)).strftime('%d.%m') in HOLIDAYS:
@@ -30,14 +33,14 @@ def get_planning_day(formatted=True, need_date=True) -> Union[str, dt]:
     date = now + td(days=delta)
 
     if not formatted:
-        return date
+        return date.date()
 
     if delta == 0:
-        weekday = 'сегодня'
+        weekday = [v_weekdays, na_weekdays][na][-2]
     elif delta == 1:
-        weekday = 'завтра'
+        weekday = [v_weekdays, na_weekdays][na][-1]
     else:
-        weekday = weekdays[date.weekday()]
+        weekday = [v_weekdays, na_weekdays][na][date.weekday()]
 
     return f'{weekday}' + f' ({date.day} {months[date.month - 1]})' * need_date
 
