@@ -46,6 +46,7 @@ CLASS = 'class'
 DATA = 'data'
 VISIT = 'school_visit'
 REASON = 'reason'
+ALWAYS = 'permanently'
 
 DELETED = 'deleted'
 

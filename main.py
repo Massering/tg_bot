@@ -98,6 +98,9 @@ def start(message: Message):
                               'остальные отправлены как текст.')
         bot.register_next_step_handler(message, send_message_by_id)
 
+    elif message.text == '/my_id':
+        send_message(user_id, str(user_id))
+
     elif message.text.lower() in ['/menu', 'меню', '/commands', 'команды']:
         send_message(user_id, '\n'.join(map(str, bot.get_my_commands())) or 'Nothing')
 
@@ -107,7 +110,7 @@ def start(message: Message):
         if message.text == '/my_class':
             text = 'Список учеников вашего класса:\n'
             for n, student in enumerate(x for x in users if x != DELETED and users[x][CLASS] == cur_class):
-                text += f'{n + 1}. {users[student][NAME]} (id{student})'
+                text += f'{n + 1}. {users[student][NAME]} (id{student})\n'
             send_message(user_id, text)
 
         elif message.text == '/report':
@@ -120,6 +123,20 @@ def start(message: Message):
         send_message(user_id, 'Хочешь зарегистрироваться?',
                      reply_markup=make_bool_keyboard())
         bot.register_next_step_handler(message, if_register)
+
+    elif message.text == '/permanently':
+        data = '\n'.join(f'{key}: {users[user_id][key]}' for key in [DATA, VISIT, REASON])
+        send_message(user_id, f'''
+Твои данные не будут очищаться ежедневно, но каждую неделю всё равно придется писать подтверждение боту.
+Если ты не уверен, что всю неделю будешь следовать режиму, отключи эту функцию.
+Отключить её можно в любой момент, написав /permanently
+
+Проверь, чтобы введенные сейчас данные были именно такими, какими ты хочешь их оставить:
+{data}
+
+Ты уверен?''',
+                     reply_markup=make_bool_keyboard())
+        bot.register_next_step_handler(message, make_permanently)
 
     elif message.text == '/change_name':
         send_message(user_id, 'Введи новое имя. Имей в виду, что твой классный советник '
@@ -137,6 +154,28 @@ def start(message: Message):
                               f' данные {get_planning_day(need_date=False, na=True)}?',
                      reply_markup=make_bool_keyboard())
         bot.register_next_step_handler(message, get_if_want_to_change_data)
+
+
+def make_permanently(message: Message):
+    if log(message):
+        return
+
+    message.text = message.text.lower()
+
+    data = users[message.from_user.id].get(ALWAYS, False)
+    if message.text in ['нет', 'да'] and data != ['нет', 'да'].index(message.text):
+        users[message.from_user.id][ALWAYS] = not data
+        dump(users, USERS)
+
+        send_message(message.from_user.id, 'Изменено.')
+
+    elif message.text in ['нет', 'да']:
+        send_message(message.from_user.id, ['Ну и славно)', 'Хорошо.'][data])
+
+    else:
+        send_message(message.from_user.id, 'Этот бот немножко тупой. Чтобы он тебя понимал, '
+                                           'пожалуйста, используй только ответы "да" и "нет".')
+        bot.register_next_step_handler(message, make_permanently)
 
 
 def send_message_by_id(message: Message):
@@ -237,6 +276,7 @@ def get_at_school(message: Message):
         return
 
     if message.text.lower() == 'да':
+        users[message.from_user.id][DATA] = False
         users[message.from_user.id][VISIT] = True
         dump(users, USERS)
 
@@ -254,7 +294,7 @@ def get_at_school(message: Message):
     else:
         send_message(message.from_user.id, 'Этот бот немножко тупой. Чтобы он тебя понимал, '
                                            'пожалуйста, используй только ответы "да" и "нет".')
-        bot.register_next_step_handler(message, get_data)
+        bot.register_next_step_handler(message, get_at_school)
 
 
 def get_no_school_reason(message: Message):
@@ -360,10 +400,10 @@ def register_end(message: Message, name, class_letter):
 def send_notification(morning=False):
     log('send_notification was called')
 
-    # if morning and dt.now().date() != get_planning_day(formatted=False) or \
-    #         not morning and (dt.now() + td(days=1)).date() != get_planning_day(formatted=False):
-    #     log('send_notification was aborted')
-    #     return
+    if morning and dt.now().date() != get_planning_day(formatted=False) or \
+            not morning and (dt.now() + td(days=1)).date() != get_planning_day(formatted=False):
+        log('send_notification was aborted')
+        return
 
     for user_id in users:
         if users[user_id].get(DATA, False) is None:
@@ -382,10 +422,10 @@ def send_notification(morning=False):
                     log(error)
 
 
-def send_report(clear=True, classes=CLASSES):
+def send_report(clear=False, classes=CLASSES):
     log('send_report was called' + ' by schedule')
 
-    if len(classes) > 1 and dt.now().date() != get_planning_day(formatted=False):
+    if len(classes) > 1 and dt.now().date() != get_planning_day(formatted=False, send_report=True):
         log('send_report was aborted')
         return
 
@@ -393,21 +433,22 @@ def send_report(clear=True, classes=CLASSES):
         cur_class = list(filter(lambda x: x.get(CLASS) == let, users.values()))
 
         text = no_data = lunch = no_lunch = no_school = ''
-        k = [0] * 3
+        k = [0] * 4
 
         for student in cur_class:
             if student[DATA] is None:
-                no_data += student[NAME] + '\n'
+                k[3] += 1
+                no_data += f'{k[3]}. {student[NAME]}\n'
             elif student[DATA]:
-                lunch += student[NAME] + '\n'
                 k[0] += 1
+                lunch += f'{k[0]}. {student[NAME]}\n'
             elif student[VISIT]:
-                no_lunch += student[NAME] + '\n'
                 k[1] += 1
+                no_lunch += f'{k[1]}. {student[NAME]}\n'
             else:
-                no_school += f'{student[NAME]}: "{student[REASON] or "Причина не была указана."}"\n'
                 k[2] += 1
-            if clear:
+                no_school += f'{k[2]}. {student[NAME]}: "{student[REASON] or "Причина не была указана."}"\n'
+            if clear and not student.get(ALWAYS):
                 student[DATA] = student[VISIT] = None
 
         if lunch:
@@ -436,12 +477,23 @@ def send_report(clear=True, classes=CLASSES):
             log(f'Классный советник класса {let} не зарегистрирован!')
 
 
+def send_notification_about_permanently():
+    for student in users:
+        if student[ALWAYS]:
+            send_message(student, 'Ты уверен, что всю следующую неделю будешь следовать режиму?',
+                         reply_markup=make_bool_keyboard())
+            bot.register_next_step_handler(make_empty_message(student), make_permanently)
+
+
 def run_schedule():
     schedule.every().day.at(MORNING_TIME).do(send_message, SOPHIA, 'Доброе утро, зайка, удачного дня💕')
+    schedule.every().day.at(MORNING_TIME).do(send_message, MAKSIM, 'Доброе утро, удачного дня')
 
     schedule.every().day.at(MORNING_TIME).do(send_notification, morning=True)
-    schedule.every().day.at(REPORT_TIME).do(send_report)
+    schedule.every().day.at(REPORT_TIME).do(send_report, clear=True)
     schedule.every().day.at(EVENING_TIME).do(send_notification)
+
+    schedule.every().monday.at(EVENING_TIME).do(send_notification_about_permanently)
 
     log('Schedule started')
     while 1:

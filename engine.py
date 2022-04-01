@@ -13,7 +13,7 @@ def get_date() -> str:
     return dt.now().strftime("%y.%m.%d %H:%M:%S")
 
 
-def get_planning_day(formatted=True, need_date=True, na=False) -> Union[str, date]:
+def get_planning_day(formatted=True, need_date=True, na=False, send_report=False) -> Union[str, date]:
     """Получение строки с датой и временем, на которые будут записаны данные"""
 
     months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля',
@@ -24,25 +24,26 @@ def get_planning_day(formatted=True, need_date=True, na=False) -> Union[str, dat
                    'на пятницу', 'на субботу', 'на воскресенье', 'на сегодня', 'на завтра']
 
     now = dt.now()
-    delta = now > now.replace(**dict(zip(['hour', 'minute'], map(int, REPORT_TIME.split(':')))))
+    report_time = now.replace(**dict(zip(['hour', 'minute'], map(int, REPORT_TIME.split(':')))))
+    delta = now > report_time + td(hours=send_report)
     delta += now.weekday() == 6 - delta
 
     while (now + td(days=delta)).strftime('%d.%m') in HOLIDAYS:
         delta += 1
 
-    date = now + td(days=delta)
+    planning_date = now + td(days=delta)
 
     if not formatted:
-        return date.date()
+        return planning_date.date()
 
     if delta == 0:
         weekday = [v_weekdays, na_weekdays][na][-2]
     elif delta == 1:
         weekday = [v_weekdays, na_weekdays][na][-1]
     else:
-        weekday = [v_weekdays, na_weekdays][na][date.weekday()]
+        weekday = [v_weekdays, na_weekdays][na][planning_date.weekday()]
 
-    return f'{weekday}' + f' ({date.day} {months[date.month - 1]})' * need_date
+    return f'{weekday}' + f' ({planning_date.day} {months[planning_date.month - 1]})' * need_date
 
 
 def dump(obj: Union[list, dict, str], filename: str) -> None:
