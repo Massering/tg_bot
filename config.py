@@ -37,17 +37,19 @@ TEACHER_COMMANDS = '''
 
 USERS = 'users.json'
 LOGS = 'logs.txt'
-STATISTIC = 'stat.txt'
+STATISTIC = 'stat.json'
 
 ENCODING = 'utf-8'
 
 NAME = 'name'
 CLASS = 'class'
-DATA = 'data'
+LUNCH = 'lunch'
 VISIT = 'school_visit'
 REASON = 'reason'
 ALWAYS = 'permanently'
 
 DELETED = 'deleted'
+
+STUDENT = 'student'
 
 GIRLS = [1998062038, 1344741369, 1263832945]

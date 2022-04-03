@@ -13,10 +13,14 @@ from config import *
 
 if not os.path.exists(USERS):
     dump({DELETED: {}}, USERS)
-    # raise FileNotFoundError(f'ФАЙЛ {USERS} НЕ СУЩЕСТВУЕТ')
+
 users = json.load(open(USERS, 'r', encoding=ENCODING))
 users = {i if i == DELETED else int(i): users[i] for i in users}
 users[DELETED] = {int(i): users[DELETED][i] for i in users[DELETED]}
+
+if not os.path.exists(STATISTIC):
+    dump({STUDENT: [], CLASS: []}, STATISTIC)
+statistic = json.load(open(STATISTIC, 'r', encoding=ENCODING))
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -46,8 +50,11 @@ def send_message_by_input():
             log(f'Лох, как ты смог допустить ошибку "{error.__class__} - {error}"')
 
 
-def log(message, starting=False):
+def log(message, starting=False, send_admin=False):
     """Вывод в консоль уведомления о сообщении боту + Проверка сообщения (выход)"""
+
+    if send_admin:
+        send_message(MAKSIM, str(message))
 
     if isinstance(message, Message):
         name = get_fullname(message)
@@ -125,8 +132,9 @@ def start(message: Message):
         bot.register_next_step_handler(message, if_register)
 
     elif message.text == '/permanently':
-        data = '\n'.join(f'{key}: {users[user_id][key]}' for key in [DATA, VISIT, REASON])
-        send_message(user_id, f'''
+        if not users[user_id].get(ALWAYS):
+            data = '\n'.join(f'{key}: {users[user_id][key]}' for key in [LUNCH, VISIT, REASON])
+            send_message(user_id, f'''
 Твои данные не будут очищаться ежедневно, но каждую неделю всё равно придется писать подтверждение боту.
 Если ты не уверен, что всю неделю будешь следовать режиму, отключи эту функцию.
 Отключить её можно в любой момент, написав /permanently
@@ -134,9 +142,12 @@ def start(message: Message):
 Проверь, чтобы введенные сейчас данные были именно такими, какими ты хочешь их оставить:
 {data}
 
-Ты уверен?''',
-                     reply_markup=make_bool_keyboard())
-        bot.register_next_step_handler(message, make_permanently)
+Ты уверен?''', reply_markup=make_bool_keyboard())
+            bot.register_next_step_handler(message, make_permanently)
+
+        else:
+            send_message(user_id, 'Отключить функцию?', reply_markup=make_bool_keyboard())
+            bot.register_next_step_handler(message, make_permanently)
 
     elif message.text == '/change_name':
         send_message(user_id, 'Введи новое имя. Имей в виду, что твой классный советник '
@@ -149,8 +160,11 @@ def start(message: Message):
                      reply_markup=make_bool_keyboard())
         bot.register_next_step_handler(message, del_user)
 
+    elif message.text == '/TV' and user_id in [SOPHIA, MAKSIM]:
+        os.startfile(r'C:\Program Files\TeamViewer\TeamViewer.exe')
+
     else:
-        send_message(user_id, f'Хочешь {"записать" * (users[user_id][DATA] is None) or "изменить"}'
+        send_message(user_id, f'Хочешь {"записать" * (users[user_id][LUNCH] is None) or "изменить"}'
                               f' данные {get_planning_day(need_date=False, na=True)}?',
                      reply_markup=make_bool_keyboard())
         bot.register_next_step_handler(message, get_if_want_to_change_data)
@@ -163,13 +177,13 @@ def make_permanently(message: Message):
     message.text = message.text.lower()
 
     data = users[message.from_user.id].get(ALWAYS, False)
-    if message.text in ['нет', 'да'] and data != ['нет', 'да'].index(message.text):
+    if message.text == 'да':
         users[message.from_user.id][ALWAYS] = not data
         dump(users, USERS)
 
         send_message(message.from_user.id, 'Изменено.')
 
-    elif message.text in ['нет', 'да']:
+    elif message.text == 'нет':
         send_message(message.from_user.id, ['Ну и славно)', 'Хорошо.'][data])
 
     else:
@@ -234,26 +248,29 @@ def get_if_want_to_change_data(message: Message):
         if message.from_user.id in GIRLS:
             send_message(message.from_user.id, 'Пизда')
 
-        ask_data(message)
+        ask_lunch(message)
     else:
         send_message(message.from_user.id, 'Нет так нет')
 
 
-def ask_data(message: Message):
+def ask_lunch(message: Message):
     """Спрашивает пользователя, собирается ли он обедать в ближайший день"""
     send_message(message.from_user.id, f'Ты будешь обедать {get_planning_day()}?',
                  reply_markup=make_bool_keyboard())
-    bot.register_next_step_handler(message, get_data)
+    bot.register_next_step_handler(message, get_lunch)
 
 
-def get_data(message: Message):
+def get_lunch(message: Message):
     """Изначальная функция, получающая данные пользователя"""
     if log(message):
         return
 
     if message.text.lower() == 'да':
-        users[message.from_user.id][DATA] = True
+        users[message.from_user.id][LUNCH] = True
         dump(users, USERS)
+
+        statistic[STUDENT].append((message.from_user.id, get_date(), dt.now().weekday() + 1, 1))
+        dump(statistic, STATISTIC)
 
         if message.from_user.id in GIRLS:
             send_message(message.from_user.id, 'Пизда')
@@ -267,7 +284,7 @@ def get_data(message: Message):
     else:
         send_message(message.from_user.id, 'Этот бот немножко тупой. Чтобы он тебя понимал, пожалуйста, '
                                            'используй только ответы "да" и "нет".')
-        bot.register_next_step_handler(message, get_data)
+        bot.register_next_step_handler(message, get_lunch)
 
 
 def get_at_school(message: Message):
@@ -276,19 +293,25 @@ def get_at_school(message: Message):
         return
 
     if message.text.lower() == 'да':
-        users[message.from_user.id][DATA] = False
+        users[message.from_user.id][LUNCH] = False
         users[message.from_user.id][VISIT] = True
         dump(users, USERS)
+
+        statistic[STUDENT].append((message.from_user.id, get_date(), dt.now().weekday() + 1, 2))
+        dump(statistic, STATISTIC)
 
         send_message(message.from_user.id, 'Записано!')
 
     elif message.text.lower() == 'нет':
-        users[message.from_user.id][DATA] = False
+        users[message.from_user.id][LUNCH] = False
         users[message.from_user.id][VISIT] = False
         dump(users, USERS)
 
+        statistic[STUDENT].append((message.from_user.id, get_date(), dt.now().weekday() + 1, 3))
+        dump(statistic, STATISTIC)
+
         send_message(message.from_user.id, 'Пожалуйста, укажи причину для твоего классного советника.',
-                     reply_markup=make_keyboard([users[message.from_user.id][REASON] or '']))
+                     reply_markup=make_keyboard([users[message.from_user.id].get(REASON) or '']))
         bot.register_next_step_handler(message, get_no_school_reason)
 
     else:
@@ -336,15 +359,20 @@ def register(message: Message):
     if current_class not in CLASSES:
         send_message(user_id, 'Нет такого класса',
                      reply_markup=make_keyboard(CLASSES))
+        send_message(MAKSIM, f'Пользователь id {user_id} пытался зарегистрироваться в классе {current_class}')
         bot.register_next_step_handler(message, register)
         return
 
-    if user_id in users[DELETED] and current_class != users[DELETED][user_id][CLASS]:
-        send_message(user_id, 'Имей в виду, что классному советнику выбранного тобой класса '
-                              'придет уведомление о твоей регистрации.')
+    names = {get_fullname(message)}
+    if user_id in users[DELETED]:
+        names.add(users[DELETED][user_id][NAME])
+
+        if current_class != users[DELETED][user_id][CLASS]:
+            send_message(user_id, 'Имей в виду, что классному советнику выбранного тобой класса '
+                                  'придет уведомление о твоей регистрации.')
 
     send_message(user_id, 'Введи фамилию и имя (так, чтоб классный советник понял, что это ты)',
-                 reply_markup=make_keyboard([get_fullname(message)]))
+                 reply_markup=make_keyboard(names))
     bot.register_next_step_handler(message, register_name, current_class)
 
 
@@ -369,7 +397,7 @@ def register_end(message: Message, name, class_letter):
         users[message.from_user.id] = {
             CLASS: class_letter,
             NAME: name,
-            DATA: None,
+            LUNCH: None,
             VISIT: None,
             REASON: None
         }
@@ -398,76 +426,78 @@ def register_end(message: Message, name, class_letter):
 
 
 def send_notification(morning=False):
-    log('send_notification was called')
+    log('send_notification was called', send_admin=True)
 
     if morning and dt.now().date() != get_planning_day(formatted=False) or \
             not morning and (dt.now() + td(days=1)).date() != get_planning_day(formatted=False):
-        log('send_notification was aborted')
+        log('send_notification was aborted', send_admin=True)
         return
 
     for user_id in users:
-        if users[user_id].get(DATA, False) is None:
+        if users[user_id].get(LUNCH, False) is None:
             try:
-                ask_data(make_empty_message(user_id))
+                ask_lunch(make_empty_message(user_id))
 
             except Exception as error:
                 if 'bot was blocked by the user' in str(error):
                     # del users[user_id]
                     error = f'Пользователь {users[user_id][NAME]} ({user_id}) заблокировал ' \
                             f'бота и (не) был удален.'
-                    log(error)
-                    send_message(MAKSIM, error)
 
-                else:
-                    log(error)
+                log(error, send_admin=True)
 
 
 def send_report(clear=False, classes=CLASSES):
-    log('send_report was called' + ' by schedule')
+    log('send_report was called', send_admin=True)
 
-    if len(classes) > 1 and dt.now().date() != get_planning_day(formatted=False, send_report=True):
-        log('send_report was aborted')
+    if len(classes) > 1 and dt.now().date() != get_planning_day(formatted=False, strong=True):
+        log('send_report was aborted', send_admin=True)
         return
 
     for let in classes:
-        cur_class = list(filter(lambda x: x.get(CLASS) == let, users.values()))
+        cur_class = list(filter(lambda x: users[x].get(CLASS) == let, users))
 
         text = no_data = lunch = no_lunch = no_school = ''
         k = [0] * 4
 
         for student in cur_class:
-            if student[DATA] is None:
-                k[3] += 1
-                no_data += f'{k[3]}. {student[NAME]}\n'
-            elif student[DATA]:
+            if users[student][LUNCH] is None:
                 k[0] += 1
-                lunch += f'{k[0]}. {student[NAME]}\n'
-            elif student[VISIT]:
+                no_data += f'{k[0]}. {users[student][NAME]}\n'
+            elif users[student][LUNCH]:
                 k[1] += 1
-                no_lunch += f'{k[1]}. {student[NAME]}\n'
-            else:
+                lunch += f'{k[1]}. {users[student][NAME]}\n'
+            elif users[student][VISIT]:
                 k[2] += 1
-                no_school += f'{k[2]}. {student[NAME]}: "{student[REASON] or "Причина не была указана."}"\n'
-            if clear and not student.get(ALWAYS):
-                student[DATA] = student[VISIT] = None
+                no_lunch += f'{k[2]}. {users[student][NAME]}\n'
+            else:
+                k[3] += 1
+                no_school += f'{k[3]}. {users[student][NAME]}: ' \
+                             f'"{users[student].get(REASON) or "Причина не была указана."}"\n'
+            if clear and not users[student].get(ALWAYS):
+                users[student][LUNCH] = users[student][VISIT] = None
+        dump(users, USERS)
 
-        if lunch:
-            text += f"{get_planning_day().capitalize()} {reform('будет', k[0])} обедать {k[0]} " \
-                    f"{reform('ученик', k[0])} класса {let}:\n"
+        statistic[CLASS].append((let, get_date(), dt.now().weekday() + 1) + tuple(k))
+        dump(statistic, STATISTIC)
+
+        if k[1]:
+            text += f"{get_planning_day().capitalize()} {reform('будет', k[1])} обедать {k[1]} " \
+                    f"{reform('ученик', k[1])} класса {let}:\n"
             text += lunch
         else:
             text += f"{get_planning_day().capitalize()} ни один ученик класса {let} не будет обедать.\n"
 
-        if no_lunch:
-            text += f"\nНе {reform('будет', k[1])} обедать, но " \
-                    f"{reform('будет', k[1])} в школе {k[1]} {reform('ученик', k[1])}:\n"
+        if k[2]:
+            text += f"\nНе {reform('будет', k[2])} обедать, но " \
+                    f"{reform('будет', k[2])} в школе {k[2]} {reform('ученик', k[2])}:\n"
             text += no_lunch
 
-        if no_school:
-            text += f"\nНе {reform('будет', k[2])} в школе {k[2]} {reform('ученик', k[2])}:\n"
+        if k[3]:
+            text += f"\nНе {reform('будет', k[3])} в школе {k[3]} {reform('ученик', k[3])}:\n"
             text += no_school
 
-        if no_data:
+        if k[0]:
             text += f"\nНе получено данных от:\n"
             text += no_data
 
@@ -479,7 +509,7 @@ def send_report(clear=False, classes=CLASSES):
 
 def send_notification_about_permanently():
     for student in users:
-        if student[ALWAYS]:
+        if student.get(ALWAYS):
             send_message(student, 'Ты уверен, что всю следующую неделю будешь следовать режиму?',
                          reply_markup=make_bool_keyboard())
             bot.register_next_step_handler(make_empty_message(student), make_permanently)
@@ -493,15 +523,14 @@ def run_schedule():
     schedule.every().day.at(REPORT_TIME).do(send_report, clear=True)
     schedule.every().day.at(EVENING_TIME).do(send_notification)
 
-    schedule.every().monday.at(EVENING_TIME).do(send_notification_about_permanently)
+    schedule.every().sunday.at(EVENING_TIME).do(send_notification_about_permanently)
 
     log('Schedule started')
     while 1:
         try:
             schedule.run_pending()
         except Exception as error:
-            log('schedule error - ' + str(error.__class__) + ' ' + str(error))
-        # schedule.idle_seconds()
+            log('schedule error - ' + str(error.__class__) + ' ' + str(error), send_admin=True)
         sleep(1)
 
 

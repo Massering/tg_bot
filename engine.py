@@ -13,19 +13,19 @@ def get_date() -> str:
     return dt.now().strftime("%y.%m.%d %H:%M:%S")
 
 
-def get_planning_day(formatted=True, need_date=True, na=False, send_report=False) -> Union[str, date]:
+def get_planning_day(formatted=True, need_date=True, na=False, strong=False) -> Union[str, date]:
     """Получение строки с датой и временем, на которые будут записаны данные"""
 
     months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля',
               'августа', 'сентября', 'октября', 'ноября', 'декабря']
-    v_weekdays = ['в понедельник', 'во вторник', 'в среду', 'в четверг',
-                  'в пятницу', 'в субботу', 'в воскресенье', 'сегодня', 'завтра']
-    na_weekdays = ['на понедельник', 'на вторник', 'на среду', 'на четверг',
-                   'на пятницу', 'на субботу', 'на воскресенье', 'на сегодня', 'на завтра']
+    next_days = ['сегодня', 'завтра']
+    weekdays = ['понедельник', 'вторник', 'среду', 'четверг', 'пятницу', 'субботу', 'воскресенье']
+    v_weekdays = [['в ', 'во '][day[:2] == 'вт'] + day for day in weekdays] + next_days
+    na_weekdays = ['на ' + day for day in weekdays + next_days]
 
     now = dt.now()
     report_time = now.replace(**dict(zip(['hour', 'minute'], map(int, REPORT_TIME.split(':')))))
-    delta = now > report_time + td(hours=send_report)
+    delta = now > report_time + td(hours=strong)
     delta += now.weekday() == 6 - delta
 
     while (now + td(days=delta)).strftime('%d.%m') in HOLIDAYS:
@@ -77,6 +77,7 @@ def reform(word: str, main_word: Union[int, str]) -> str:
     word_form: pymorphy2.analyzer.Parse = morph.parse(word)[0]
     if isinstance(main_word, int):
         return word_form.make_agree_with_number(main_word).word
+    # TODO: Доделать бы
     return word_form.word
 
 
