@@ -97,7 +97,7 @@
     "1868213058": {
         "class": "Йота",
         "name": "Абакановский Влад",
-        "lunch": null,
+        "lunch": true,
         "school_visit": null
     },
     "1883271571": {
