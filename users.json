@@ -19,9 +19,9 @@
     },
     "603377678": {
         "class": "Йота",
-        "name": "Vadim",
-        "lunch": false,
-        "school_visit": false,
+        "name": "Попов Вадим",
+        "lunch": null,
+        "school_visit": null,
         "reason": "Приболел, кашель сопли, думаю ко вторнику уже долечусь"
     },
     "700026795": {
@@ -33,20 +33,21 @@
     "979923466": {
         "class": "Йота",
         "name": "Совкова София",
-        "lunch": true,
-        "school_visit": null,
-        "reason": null
+        "lunch": false,
+        "school_visit": false,
+        "reason": "Буду на интенсиве"
     },
     "1061139622": {
         "class": "Йота",
         "name": "Марьясов Владимир",
-        "lunch": true,
-        "school_visit": null
+        "lunch": false,
+        "school_visit": false,
+        "reason": "Уехал в лагерь"
     },
     "1069934389": {
         "class": "Йота",
         "name": "Постоева Анастасия",
-        "lunch": true,
+        "lunch": null,
         "school_visit": null
     },
     "1089524173": {
@@ -58,8 +59,8 @@
     },
     "1165152297": {
         "class": "Йота",
-        "name": "ЫльяЗ",
-        "lunch": null,
+        "name": "Зарипов Ылья",
+        "lunch": true,
         "school_visit": null,
         "reason": null
     },
@@ -78,7 +79,7 @@
     "1344741369": {
         "class": "Йота",
         "name": "Иванцова Аня",
-        "lunch": null,
+        "lunch": true,
         "school_visit": null
     },
     "1430032907": {
@@ -102,8 +103,8 @@
     "1883271571": {
         "class": "Йота",
         "name": "Муковозчик Артём",
-        "lunch": false,
-        "school_visit": true
+        "lunch": true,
+        "school_visit": null
     },
     "1987908012": {
         "class": "Йота",

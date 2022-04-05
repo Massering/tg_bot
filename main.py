@@ -34,7 +34,7 @@ def send_message(user_id: Union[int, str], text: str, reply_markup=None):
 
 
 def send_message_by_input():
-    last_id, user_id, text = [None] * 3
+    last_id = user_id = text = None
     while 1:
         try:
             user_id, *text = input().split()
@@ -455,7 +455,7 @@ def send_report(clear=False, classes=CLASSES):
         return
 
     for let in classes:
-        cur_class = list(filter(lambda x: users[x].get(CLASS) == let, users))
+        cur_class = sorted(filter(lambda x: users[x].get(CLASS) == let, users), key=lambda x: users[x][NAME])
 
         text = no_data = lunch = no_lunch = no_school = ''
         k = [0] * 4
@@ -477,9 +477,6 @@ def send_report(clear=False, classes=CLASSES):
             if clear and not users[student].get(ALWAYS):
                 users[student][LUNCH] = users[student][VISIT] = None
         dump(users, USERS)
-
-        statistic[CLASS].append((let, get_date(), dt.now().weekday() + 1) + tuple(k))
-        dump(statistic, STATISTIC)
 
         if k[1]:
             text += f"{get_planning_day().capitalize()} {reform('будет', k[1])} обедать {k[1]} " \
@@ -503,11 +500,18 @@ def send_report(clear=False, classes=CLASSES):
 
         try:
             send_message(CLASSES[let], text)
+
+            statistic[CLASS].append((let, get_date(), dt.now().weekday() + 1) + tuple(k))
+            dump(statistic, STATISTIC)
+
+            send_message(MAKSIM, text)
         except telebot.apihelper.ApiException:
             log(f'Классный советник класса {let} не зарегистрирован!')
 
 
 def send_notification_about_permanently():
+    log('send_notification_about_permanently was called', send_admin=True)
+
     for student in users:
         if student.get(ALWAYS):
             send_message(student, 'Ты уверен, что всю следующую неделю будешь следовать режиму?',
