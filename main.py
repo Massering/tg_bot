@@ -1,10 +1,9 @@
 import os
+from time import sleep
 
-import requests
+from requests import exceptions
 import schedule
 from threading import Thread
-
-from time import sleep
 
 import telebot
 
@@ -561,9 +560,9 @@ if __name__ == "__main__":
         try:
             bot.polling(non_stop=True, skip_pending=True)
         except Exception as log_error:
-            if isinstance(log_error, (requests.exceptions.ConnectionError,
-                                      requests.exceptions.ReadTimeout,
-                                      requests.exceptions.ConnectionError)):
+            if isinstance(log_error, (exceptions.ConnectionError,
+                                      exceptions.ReadTimeout,
+                                      exceptions.ConnectionError)):
                 log('That annoying errors erroring again')
                 log_text = None
             else:

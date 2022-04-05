@@ -92,7 +92,7 @@ def make_empty_message(chat_id: Union[str, int]) -> Message:
 def format_json(m, level=0, indent=None) -> str:
     margin = ' ' * (indent or 2) * level
     if isinstance(m, dict):
-        text = '{\n'
+        text = '{' + '\n' * bool(m)
         for n, i in enumerate(m, 1):
             text += margin + f'  "{str(i)}": '
             text += format_json(m[i], level + 1, indent=indent)
@@ -102,7 +102,7 @@ def format_json(m, level=0, indent=None) -> str:
                 text += '\n'
         text += '}'
     else:
-        if isinstance(m[0], list):
+        if m and isinstance(m[0], list):
             text = '[\n'
             for n, i in enumerate(m, 1):
                 text += margin + '  '
