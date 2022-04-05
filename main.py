@@ -50,11 +50,14 @@ def send_message_by_input():
             log(f'Лох, как ты смог допустить ошибку "{error.__class__} - {error}"')
 
 
-def log(message, starting=False, send_admin=False):
+def log(message, starting=False, send_admin=False, to_file=False):
     """Вывод в консоль уведомления о сообщении боту + Проверка сообщения (выход)"""
 
     if send_admin:
         send_message(MAKSIM, str(message))
+
+    if to_file:
+        open(LOGS, 'a', encoding='utf-8').write(str(message) + '\n')
 
     if isinstance(message, Message):
         name = get_fullname(message)
@@ -534,7 +537,7 @@ def run_schedule():
         try:
             schedule.run_pending()
         except Exception as error:
-            log('schedule error - ' + str(error.__class__) + ' ' + str(error), send_admin=True)
+            log('Schedule error - ' + str(error.__class__) + ' ' + str(error), send_admin=True, to_file=True)
         sleep(1)
 
 
@@ -558,7 +561,6 @@ if __name__ == "__main__":
                 log_text = None
             else:
                 log_text = f'({log_error.__class__}, {log_error.__cause__}): {log_error}'
-                log(log_text)
+                log(log_text, to_file=True)
                 log_text = f'{get_date()} - ' + log_text
-                open(LOGS, 'a', encoding=ENCODING).write(log_text + '\n')
             sleep(5)
