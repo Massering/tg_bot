@@ -48,7 +48,10 @@ def get_planning_day(formatted=True, need_date=True, na=False, strong=False) -> 
 
 def dump(obj: Union[list, dict, str], filename: str) -> None:
     """Функция для простого внесения данных в файлы"""
-    json.dump(obj, open(filename, 'w', encoding=ENCODING), ensure_ascii=False, indent=4)
+    if isinstance(obj, str):
+        open(filename, 'w', encoding=ENCODING).write(obj)
+    else:
+        json.dump(obj, open(filename, 'w', encoding=ENCODING), ensure_ascii=False, indent=2)
 
 
 def make_bool_keyboard(one_time=True) -> ReplyKeyboardMarkup:
@@ -84,3 +87,32 @@ def reform(word: str, main_word: Union[int, str]) -> str:
 def make_empty_message(chat_id: Union[str, int]) -> Message:
     chat = Chat(int(chat_id), None)
     return Message(0, chat, '', chat, '', '', '')
+
+
+def format_json(m, level=0, indent=None) -> str:
+    margin = ' ' * (indent or 2) * level
+    if isinstance(m, dict):
+        text = '{\n'
+        for n, i in enumerate(m, 1):
+            text += margin + f'  "{str(i)}": '
+            text += format_json(m[i], level + 1, indent=indent)
+            if n != len(m):
+                text += ',\n'
+            else:
+                text += '\n'
+        text += '}'
+    else:
+        if isinstance(m[0], list):
+            text = '[\n'
+            for n, i in enumerate(m, 1):
+                text += margin + '  '
+                text += format_json(i, level + 1, indent=indent)
+                if n != len(m):
+                    text += ',\n'
+                else:
+                    text += '\n'
+            text += margin + ']'
+
+        else:
+            text = str(m).replace("'", '"')
+    return text

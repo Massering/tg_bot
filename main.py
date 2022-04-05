@@ -57,12 +57,17 @@ def log(message, starting=False, send_admin=False, to_file=False):
         send_message(MAKSIM, str(message))
 
     if to_file:
-        open(LOGS, 'a', encoding='utf-8').write(str(message) + '\n')
+        open(LOGS, 'a', encoding='utf-8').write(f'{get_date()} - "{message}"\n')
 
     if isinstance(message, Message):
         name = get_fullname(message)
         name += f' (id {message.from_user.id})'
-        print(f'{get_date()} - {name}: "{message.text}"')
+        text = f'{get_date()} - {name}: "{message.text}"'
+        print(text)
+
+        message.text = message.text.lower()
+        if 'я' in message.text and 'советник' in message.text:
+            send_message(MAKSIM, text)
 
         if message.text == '/exit':
             send_message(message.from_user.id, 'Выход из сценария')
@@ -111,16 +116,19 @@ def start(message: Message):
     elif message.text == '/my_id':
         send_message(user_id, str(user_id))
 
-    elif message.text.lower() in ['/menu', 'меню', '/commands', 'команды']:
-        send_message(user_id, '\n'.join(map(str, bot.get_my_commands())) or 'Nothing')
-
     elif user_id in CLASSES.values():
         *_, cur_class = sorted(i[0] for i in CLASSES.items() if i[1] == user_id)
 
         if message.text == '/my_class':
-            text = 'Список учеников вашего класса:\n'
-            for n, student in enumerate(x for x in users if x != DELETED and users[x][CLASS] == cur_class):
-                text += f'{n + 1}. {users[student][NAME]} (id{student})\n'
+            text = 'Список учеников вашего класса:\n\n'
+            students = [x for x in users if x != DELETED and users[x][CLASS] == cur_class]
+            max_length = max(len(users[i][NAME]) for i in students)
+
+            for n, student in enumerate(sorted(students, key=lambda x: users[x][NAME]), 1):
+                name = users[student][NAME].ljust(max_length)
+                name += ' ' * name.count(' ')
+                text += f"{n}. {name}" + f' id {student}\n'
+
             send_message(user_id, text)
 
         elif message.text == '/report':
@@ -205,9 +213,9 @@ def send_message_by_id(message: Message):
         if message.from_user.id == MAKSIM:
             send_message(user_id, ' '.join(text))
         else:
-            send_message(user_id, f'id{message.from_user.id}: \n{" ".join(text)}')
+            send_message(user_id, f'id {message.from_user.id}: \n{" ".join(text)}')
 
-        send_message(message.from_user.id, f'Отправлено to id{user_id} "{" ".join(text)}"')
+        send_message(message.from_user.id, f'Отправлено to id {user_id} "{" ".join(text)}"')
 
     except Exception as error:
         send_message(message.from_user.id, f'Лох, как ты смог допустить ошибку "{error.__class__} - {error}"')
@@ -504,8 +512,9 @@ def send_report(clear=False, classes=CLASSES):
         try:
             send_message(CLASSES[let], text)
 
-            statistic[CLASS].append((let, get_date(), dt.now().weekday() + 1) + tuple(k))
-            dump(statistic, STATISTIC)
+            if clear:
+                statistic[CLASS].append((let, get_date(), dt.now().weekday() + 1) + tuple(k))
+                dump(format_json(statistic), STATISTIC)
 
             send_message(MAKSIM, text)
         except telebot.apihelper.ApiException:
@@ -537,8 +546,8 @@ def run_schedule():
         try:
             schedule.run_pending()
         except Exception as error:
-            log('Schedule error - ' + str(error.__class__) + ' ' + str(error), send_admin=True, to_file=True)
-        sleep(1)
+            log('Schedule error: ' + str(error.__class__) + ' ' + str(error), send_admin=True, to_file=True)
+        sleep(5)
 
 
 if __name__ == "__main__":
@@ -550,8 +559,6 @@ if __name__ == "__main__":
 
     while 1:
         try:
-            if log_text:
-                send_message(MAKSIM, log_text)
             bot.polling(non_stop=True, skip_pending=True)
         except Exception as log_error:
             if isinstance(log_error, (requests.exceptions.ConnectionError,
@@ -561,6 +568,5 @@ if __name__ == "__main__":
                 log_text = None
             else:
                 log_text = f'({log_error.__class__}, {log_error.__cause__}): {log_error}'
-                log(log_text, to_file=True)
-                log_text = f'{get_date()} - ' + log_text
+                log('Bot_polling error: ' + log_text, send_admin=True, to_file=True)
             sleep(5)
