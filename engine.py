@@ -114,5 +114,5 @@ def format_json(m, level=0, indent=None) -> str:
             text += margin + ']'
 
         else:
-            text = str(m).replace("'", '"')
+            text = str(list(m)).replace("'", '"')
     return text

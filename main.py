@@ -33,10 +33,28 @@ def send_message(user_id: Union[int, str], text: str, reply_markup=None):
 
 
 def send_message_by_input():
-    last_id = user_id = text = None
+    last_id = None
     while 1:
+        s = input()
+        if not s:
+            continue
+
         try:
-            user_id, *text = input().split()
+            user_id, *text = s.split()
+        except UnicodeDecodeError:
+            s1 = ''
+            for i in s:
+                try:
+                    s1 += str(i.encode('CP866'), encoding='utf-8')
+                except UnicodeDecodeError:
+                    pass
+            user_id, *text = s1.split()
+
+        except Exception as error:
+            log(f'Лох, как ты смог допустить ошибку "{error}"')
+            continue
+
+        try:
             send_message(user_id, ' '.join(text))
             last_id = user_id
         except (telebot.apihelper.ApiException, NameError, SyntaxError):  # Пользователя не существует
