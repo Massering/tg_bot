@@ -2,60 +2,60 @@
   "400435224": {
     "class": "Йота",
     "name": "Кишкин Алексей",
-    "lunch": null,
+    "lunch": true,
     "school_visit": null
   },
   "408045956": {
     "class": "Йота",
     "name": "Соловьев Игорь",
-    "lunch": null,
-    "school_visit": null
+    "lunch": false,
+    "school_visit": true
   },
   "519905246": {
     "class": "Йота",
     "name": "Мухомедьянова Тома",
-    "lunch": null,
+    "lunch": true,
     "school_visit": null
   },
   "603377678": {
     "class": "Йота",
     "name": "Попов Вадим",
-    "lunch": null,
+    "lunch": true,
     "school_visit": null,
     "reason": "Приболел, кашель сопли, думаю ко вторнику уже долечусь"
   },
   "700026795": {
     "class": "Йота",
     "name": "Кеммерер Сергей",
-    "lunch": null,
+    "lunch": true,
     "school_visit": null
   },
   "979923466": {
     "class": "Йота",
     "name": "Совкова София",
-    "lunch": null,
-    "school_visit": null,
-    "reason": "Буду на интенсиве"
+    "lunch": false,
+    "school_visit": false,
+    "reason": "буду на интенсиве"
   },
   "1061139622": {
     "class": "Йота",
     "name": "Марьясов Владимир",
-    "lunch": null,
-    "school_visit": null,
-    "reason": "Уехал в лагерь"
+    "lunch": false,
+    "school_visit": false,
+    "reason": "уехал в лагерь"
   },
   "1069934389": {
     "class": "Йота",
     "name": "Постоева Анастасия",
-    "lunch": null,
+    "lunch": true,
     "school_visit": null
   },
   "1089524173": {
     "class": "Йота",
     "name": "Рудаков Максим",
-    "lunch": null,
-    "school_visit": null,
-    "reason": "Я буду в Интенсивной школе по программе \"Мы - изменим мир будущего\""
+    "lunch": false,
+    "school_visit": false,
+    "reason": "я буду в интенсивной школе по программе \"мы - изменим мир будущего\""
   },
   "1165152297": {
     "class": "Йота",
@@ -67,13 +67,13 @@
   "1165447922": {
     "class": "Йота",
     "name": "Бухтоярова Анастасия",
-    "lunch": null,
+    "lunch": true,
     "school_visit": null
   },
   "1214822760": {
     "class": "Йота",
     "name": "Очирова Арюна",
-    "lunch": null,
+    "lunch": true,
     "school_visit": null
   },
   "1344741369": {
@@ -85,13 +85,13 @@
   "1430032907": {
     "class": "Йота",
     "name": "Барон Владислав",
-    "lunch": null,
+    "lunch": true,
     "school_visit": null
   },
   "1831580928": {
     "class": "Йота",
     "name": "Шкредов Сергей",
-    "lunch": null,
+    "lunch": true,
     "school_visit": null
   },
   "1868213058": {
@@ -103,19 +103,19 @@
   "1883271571": {
     "class": "Йота",
     "name": "Муковозчик Артём",
-    "lunch": null,
+    "lunch": true,
     "school_visit": null
   },
   "1987908012": {
     "class": "Йота",
     "name": "Яковлев Демьян",
-    "lunch": null,
+    "lunch": true,
     "school_visit": null
   },
   "1998062038": {
     "class": "Йота",
     "name": "Юргельян Нина",
-    "lunch": null,
+    "lunch": true,
     "school_visit": null
   },
   "2078652234": {
