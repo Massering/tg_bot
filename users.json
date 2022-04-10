@@ -8,8 +8,8 @@
   "408045956": {
     "class": "Йота",
     "name": "Соловьев Игорь",
-    "lunch": false,
-    "school_visit": true
+    "lunch": null,
+    "school_visit": null
   },
   "519905246": {
     "class": "Йота",
@@ -33,15 +33,15 @@
   "979923466": {
     "class": "Йота",
     "name": "Совкова София",
-    "lunch": false,
-    "school_visit": false,
+    "lunch": true,
+    "school_visit": null,
     "reason": "буду на интенсиве"
   },
   "1061139622": {
     "class": "Йота",
     "name": "Марьясов Владимир",
-    "lunch": false,
-    "school_visit": false,
+    "lunch": null,
+    "school_visit": null,
     "reason": "уехал в лагерь"
   },
   "1069934389": {
@@ -53,14 +53,14 @@
   "1089524173": {
     "class": "Йота",
     "name": "Рудаков Максим",
-    "lunch": false,
-    "school_visit": false,
+    "lunch": true,
+    "school_visit": null,
     "reason": "я буду в интенсивной школе по программе \"мы - изменим мир будущего\""
   },
   "1165152297": {
     "class": "Йота",
     "name": "Зарипов Ылья",
-    "lunch": null,
+    "lunch": true,
     "school_visit": null,
     "reason": null
   },
@@ -103,7 +103,7 @@
   "1883271571": {
     "class": "Йота",
     "name": "Муковозчик Артём",
-    "lunch": true,
+    "lunch": null,
     "school_visit": null
   },
   "1987908012": {
@@ -121,7 +121,7 @@
   "2078652234": {
     "class": "Йота",
     "name": "Ровняго Дмитрий",
-    "lunch": null,
+    "lunch": true,
     "school_visit": null,
     "reason": null
   },

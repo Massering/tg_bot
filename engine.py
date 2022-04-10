@@ -13,7 +13,7 @@ def get_date() -> str:
     return dt.now().strftime("%y.%m.%d %H:%M:%S")
 
 
-def get_planning_day(formatted=True, need_date=True, na=False, strong=False) -> Union[str, date]:
+def get_planning_day(formatted=True, need_date=True, na=False, strong=False, need_weekday=True) -> Union[str, date]:
     """Получение строки с датой и временем, на которые будут записаны данные"""
 
     months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля',
@@ -43,7 +43,7 @@ def get_planning_day(formatted=True, need_date=True, na=False, strong=False) -> 
     else:
         weekday = [v_weekdays, na_weekdays][na][planning_date.weekday()]
 
-    return f'{weekday}' + f' ({planning_date.day} {months[planning_date.month - 1]})' * need_date
+    return f'{weekday}' * need_weekday + f' ({planning_date.day} {months[planning_date.month - 1]})' * need_date
 
 
 def dump(obj: Union[list, dict, str], filename: str) -> None:
@@ -57,7 +57,14 @@ def dump(obj: Union[list, dict, str], filename: str) -> None:
 def make_bool_keyboard(one_time=True) -> ReplyKeyboardMarkup:
     """Возвращает клавиатуру, состоящую из кнопок 'Да' и 'Нет'"""
     keyboard = ReplyKeyboardMarkup(True, one_time_keyboard=one_time)
-    keyboard.add(KeyboardButton('Да'), KeyboardButton('Нет'))
+    keyboard.add(KeyboardButton(YES.capitalize()), KeyboardButton(NO.capitalize()))
+    return keyboard
+
+
+def make_france_bool_keyboard(one_time=True) -> ReplyKeyboardMarkup:
+    """Возвращает клавиатуру, состоящую из кнопок 'Да' и 'Нет'"""
+    keyboard = ReplyKeyboardMarkup(True, one_time_keyboard=one_time)
+    keyboard.add(KeyboardButton('Oui'), KeyboardButton('Pas'))
     return keyboard
 
 
@@ -89,8 +96,8 @@ def make_empty_message(chat_id: Union[str, int]) -> Message:
     return Message(0, chat, '', chat, '', '', '')
 
 
-def format_json(m, level=0, indent=None) -> str:
-    margin = ' ' * (indent or 2) * level
+def format_json(m, level=0, indent=4) -> str:
+    margin = ' ' * indent * level
     if isinstance(m, dict):
         text = '{' + '\n' * bool(m)
         for n, i in enumerate(m, 1):

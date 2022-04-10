@@ -72,6 +72,7 @@ def log(message, starting=False, send_admin=False, to_file=False):
 
     if send_admin:
         send_message(MAKSIM, str(message))
+        send_message(SOPHIA, str(message))
 
     if to_file:
         open(LOGS, 'a', encoding='utf-8').write(f'{get_date()} - "{message}"\n')
@@ -82,11 +83,10 @@ def log(message, starting=False, send_admin=False, to_file=False):
         text = f'{get_date()} - {name}: "{message.text}"'
         print(text)
 
-        message.text = message.text.lower()
-        if 'я' in message.text and 'советник' in message.text:
+        if 'я' in message.text.lower() and 'советник' in message.text.lower():
             send_message(MAKSIM, text)
 
-        if message.text == '/exit':
+        if message.text.lower() == '/exit':
             send_message(message.from_user.id, 'Выход из сценария')
             return 1
 
@@ -191,27 +191,46 @@ def start(message: Message):
     elif message.text == '/TV' and user_id in [SOPHIA, MAKSIM]:
         os.startfile(r'C:\Program Files\TeamViewer\TeamViewer.exe')
 
-    else:
-        send_message(user_id, f'Хочешь {"записать" * (users[user_id][LUNCH] is None) or "изменить"}'
-                              f' данные {get_planning_day(need_date=False, na=True)}?',
+    elif message.text == '/mailing' and user_id in [SOPHIA, MAKSIM]:
+        send_message(user_id, 'Введи сообщение, но будь аккуратен, это пошлётся всем',
                      reply_markup=make_bool_keyboard())
+        bot.register_next_step_handler(message, mailing)
+
+    else:
+        if message.from_user.id in HUMANS:
+            send_message(user_id, f'Veux {"enregistrer" * (users[user_id][LUNCH] is None) or "modifier"}'
+                                  f' données pour demain?',
+                         reply_markup=make_france_bool_keyboard())
+        else:
+            send_message(user_id, f'Хочешь {"записать" * (users[user_id][LUNCH] is None) or "изменить"}'
+                                  f' данные {get_planning_day(need_date=False, na=True)}?',
+                         reply_markup=make_bool_keyboard())
         bot.register_next_step_handler(message, get_if_want_to_change_data)
+
+
+def mailing(message: Message):
+    if log(message):
+        return
+
+    for student in users:
+        # TODO:                                                СОЛНЦЕ
+        # Подправь или вообще убери текст, если хочешь
+        text = f'Сообщение от администратора всем пользователям:\n{message.text}'
+        send_message(student, text)
 
 
 def make_permanently(message: Message):
     if log(message):
         return
 
-    message.text = message.text.lower()
-
     data = users[message.from_user.id].get(ALWAYS, False)
-    if message.text == 'да':
+    if message.text.lower() in POSITIVE:
         users[message.from_user.id][ALWAYS] = not data
         dump(users, USERS)
 
         send_message(message.from_user.id, 'Изменено.')
 
-    elif message.text == 'нет':
+    elif message.text.lower() in NEGATIVE:
         send_message(message.from_user.id, ['Ну и славно)', 'Хорошо.'][data])
 
     else:
@@ -243,7 +262,7 @@ def del_user(message: Message):
     if log(message):
         return
 
-    if message.text.lower() == 'да':
+    if message.text.lower() in POSITIVE:
         users[DELETED][message.from_user.id] = users[message.from_user.id]
         del users[message.from_user.id]
         dump(users, USERS)
@@ -272,19 +291,26 @@ def get_if_want_to_change_data(message: Message):
     if log(message):
         return
 
-    if message.text.lower() == 'да':
+    if message.text.lower() in POSITIVE:
         if message.from_user.id in GIRLS:
             send_message(message.from_user.id, 'Пизда')
 
         ask_lunch(message)
     else:
-        send_message(message.from_user.id, 'Нет так нет')
+        if message.from_user.id in HUMANS:
+            send_message(message.from_user.id, 'Non donc non')
+        else:
+            send_message(message.from_user.id, 'Нет так нет')
 
 
 def ask_lunch(message: Message):
     """Спрашивает пользователя, собирается ли он обедать в ближайший день"""
-    send_message(message.from_user.id, f'Ты будешь обедать {get_planning_day()}?',
-                 reply_markup=make_bool_keyboard())
+    if message.from_user.id in HUMANS:
+        send_message(message.from_user.id, f'Tu vas dîner demain {get_planning_day(need_weekday=0)}?',
+                     reply_markup=make_france_bool_keyboard())
+    else:
+        send_message(message.from_user.id, f'Ты будешь обедать {get_planning_day()}?',
+                     reply_markup=make_bool_keyboard())
     bot.register_next_step_handler(message, get_lunch)
 
 
@@ -293,7 +319,7 @@ def get_lunch(message: Message):
     if log(message):
         return
 
-    if message.text.lower() == 'да':
+    if message.text.lower() in POSITIVE:
         users[message.from_user.id][LUNCH] = True
         dump(users, USERS)
 
@@ -303,10 +329,16 @@ def get_lunch(message: Message):
         if message.from_user.id in GIRLS:
             send_message(message.from_user.id, 'Пизда')
 
-        send_message(message.from_user.id, 'Записано!')
+        if message.from_user.id in HUMANS:
+            send_message(message.from_user.id, 'Enregistré!')
+        else:
+            send_message(message.from_user.id, 'Записано!')
 
-    elif message.text.lower() == 'нет':
-        send_message(message.from_user.id, 'А в школу пойдешь?', reply_markup=make_bool_keyboard())
+    elif message.text.lower() in NEGATIVE:
+        if message.from_user.id in HUMANS:
+            send_message(message.from_user.id, "Et tu iras à l'école?", reply_markup=make_france_bool_keyboard())
+        else:
+            send_message(message.from_user.id, 'А в школу пойдешь?', reply_markup=make_bool_keyboard())
         bot.register_next_step_handler(message, get_at_school)
 
     else:
@@ -320,7 +352,7 @@ def get_at_school(message: Message):
     if log(message):
         return
 
-    if message.text.lower() == 'да':
+    if message.text.lower() in POSITIVE:
         users[message.from_user.id][LUNCH] = False
         users[message.from_user.id][VISIT] = True
         dump(users, USERS)
@@ -328,9 +360,12 @@ def get_at_school(message: Message):
         statistic[STUDENT].append((message.from_user.id, get_date(), dt.now().weekday() + 1, 2))
         dump(statistic, STATISTIC)
 
-        send_message(message.from_user.id, 'Записано!')
+        if message.from_user.id in HUMANS:
+            send_message(message.from_user.id, 'Enregistré!')
+        else:
+            send_message(message.from_user.id, 'Записано!')
 
-    elif message.text.lower() == 'нет':
+    elif message.text.lower() in NEGATIVE:
         users[message.from_user.id][LUNCH] = False
         users[message.from_user.id][VISIT] = False
         dump(users, USERS)
@@ -338,8 +373,12 @@ def get_at_school(message: Message):
         statistic[STUDENT].append((message.from_user.id, get_date(), dt.now().weekday() + 1, 3))
         dump(statistic, STATISTIC)
 
-        send_message(message.from_user.id, 'Пожалуйста, укажи причину для твоего классного советника.',
-                     reply_markup=make_keyboard([users[message.from_user.id].get(REASON) or '']))
+        if message.from_user.id in HUMANS:
+            send_message(message.from_user.id, "S'il vous plaît donner une raison pour votre conseiller de classe",
+                         reply_markup=make_keyboard([users[message.from_user.id].get(REASON) or '']))
+        else:
+            send_message(message.from_user.id, 'Пожалуйста, укажи причину для твоего классного советника.',
+                         reply_markup=make_keyboard([users[message.from_user.id].get(REASON) or '']))
         bot.register_next_step_handler(message, get_no_school_reason)
 
     else:
@@ -353,7 +392,7 @@ def get_no_school_reason(message: Message):
     if log(message):
         return
 
-    if message.text.lower() == 'нет' or len(message.text) < 3:
+    if message.text.lower() in NEGATIVE or len(message.text) < 3:
         send_message(message.from_user.id, 'Ты че здесь, самый умный, да? А ну написал причину')
         bot.register_next_step_handler(message, get_no_school_reason)
 
@@ -361,7 +400,10 @@ def get_no_school_reason(message: Message):
         users[message.from_user.id][REASON] = message.text
         dump(users, USERS)
 
-        send_message(message.from_user.id, 'Записано.')
+        if message.from_user.id in HUMANS:
+            send_message(message.from_user.id, 'Enregistré!')
+        else:
+            send_message(message.from_user.id, 'Записано!')
 
 
 def if_register(message: Message):
@@ -369,7 +411,7 @@ def if_register(message: Message):
     if log(message):
         return
 
-    if message.text.lower() == 'да':
+    if message.text.lower() in POSITIVE:
         send_message(message.from_user.id, 'Выбери класс', reply_markup=make_keyboard(CLASSES))
         bot.register_next_step_handler(message, register)
     else:
@@ -387,7 +429,6 @@ def register(message: Message):
     if current_class not in CLASSES:
         send_message(user_id, 'Нет такого класса',
                      reply_markup=make_keyboard(CLASSES))
-        send_message(MAKSIM, f'Пользователь id {user_id} пытался зарегистрироваться в классе {current_class}')
         bot.register_next_step_handler(message, register)
         return
 
@@ -421,7 +462,7 @@ def register_end(message: Message, name, class_letter):
 
     global users
 
-    if message.text.lower() == 'да':
+    if message.text.lower() in POSITIVE:
         users[message.from_user.id] = {
             CLASS: class_letter,
             NAME: name,
@@ -528,12 +569,12 @@ def send_report(clear=False, classes=CLASSES):
 
         try:
             send_message(CLASSES[let], text)
+            send_message(MAKSIM, text)
+            send_message(SOPHIA, text)
 
             if clear:
                 statistic[CLASS].append((let, get_date(), dt.now().weekday() + 1) + tuple(k))
                 dump(format_json(statistic), STATISTIC)
-
-            send_message(MAKSIM, text)
         except telebot.apihelper.ApiException:
             log(f'Классный советник класса {let} не зарегистрирован!')
 
@@ -542,16 +583,15 @@ def send_notification_about_permanently():
     log('send_notification_about_permanently was called', send_admin=True)
 
     for student in users:
-        if student.get(ALWAYS):
+        if users[student].get(ALWAYS):
             send_message(student, 'Ты уверен, что всю следующую неделю будешь следовать режиму?',
                          reply_markup=make_bool_keyboard())
             bot.register_next_step_handler(make_empty_message(student), make_permanently)
 
 
 def run_schedule():
-    schedule.every().day.at(MORNING_TIME).do(send_message, SOPHIA, 'Доброе утро, зайка, удачного дня💕')
-    schedule.every().day.at(MORNING_TIME).do(send_message, MAKSIM, 'Доброе утро, удачного дня')
-
+    schedule.every().day.at(MORNING_TIME).do(send_message, SOPHIA, 'Доброе утро, солнце, удачного дня💕')
+    schedule.every().day.at(MORNING_TIME).do(send_message, MAKSIM, 'Доброе утро, удачного дня.')
     schedule.every().day.at(MORNING_TIME).do(send_notification, morning=True)
     schedule.every().day.at(REPORT_TIME).do(send_report, clear=True)
     schedule.every().day.at(EVENING_TIME).do(send_notification)
