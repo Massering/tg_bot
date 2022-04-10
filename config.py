@@ -3,7 +3,7 @@ TOKEN = '5193700613:AAGGLMJOLpAw_vBeeoDohcPERZ70ZZoxW30'
 SOPHIA, MAKSIM, DYADYA = 979923466, 1089524173, 812263756
 
 # Словарь, который будет содержать данные вида Класс: id Классного советника
-CLASSES = {
+LETTERS = {
     'Бета': 0,
     'Гамма': 0,
     'Дельта': 0,
@@ -18,18 +18,18 @@ CLASSES = {
 # Время утренних напоминаний
 MORNING_TIME = '07:00'
 # Время вечерних напоминаний
-EVENING_TIME = '20:04'
+EVENING_TIME = '20:00'
 # Время отправления отчета классным советникам
 REPORT_TIME = '08:00'
 
 YES, NO = 'да', 'нет'
-POSITIVE = [YES, 'oui', 'lf', 'дп']
-NEGATIVE = [NO, 'pas']
+POSITIVE = [YES, 'oui', 'lf', 'дп', 'yes', 'yep', 'ыыы']
+NEGATIVE = [NO, 'pas', 'no']
 
 HOLIDAYS = ['01.09', '31.10', '01.05', '01.05', '01.05', '01.05', '09.05']
 
 COMMANDS = '''
-/edit_user - редактирование имени пользователя
+/change_name - редактирование имени пользователя
 /del_user - удаление данных пользователя
 '''
 
@@ -52,9 +52,9 @@ VISIT = 'school_visit'
 REASON = 'reason'
 ALWAYS = 'permanently'
 
+STUDENTS = 'students'
+CLASSES = 'classes'
 DELETED = 'deleted'
-
-STUDENT = 'student'
 
 GIRLS = [1998062038, 1344741369, 1263832945]
 HUMANS = [979923466, 1089524173, 1987908012, 603377678]

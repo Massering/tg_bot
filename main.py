@@ -11,14 +11,17 @@ from engine import *
 from config import *
 
 if not os.path.exists(USERS):
-    dump({DELETED: {}}, USERS)
+    dump({
+        STUDENTS: {},
+        DELETED: {}
+    }, USERS)
 
 users = json.load(open(USERS, 'r', encoding=ENCODING))
-users = {i if i == DELETED else int(i): users[i] for i in users}
-users[DELETED] = {int(i): users[DELETED][i] for i in users[DELETED]}
+students = {int(i): users[STUDENTS][i] for i in users[STUDENTS]}
+deleted = {int(i): users[DELETED][i] for i in users[DELETED]}
 
 if not os.path.exists(STATISTIC):
-    dump({STUDENT: [], CLASS: []}, STATISTIC)
+    dump({STUDENTS: [], CLASSES: []}, STATISTIC)
 statistic = json.load(open(STATISTIC, 'r', encoding=ENCODING))
 
 bot = telebot.TeleBot(TOKEN)
@@ -38,6 +41,12 @@ def send_message_by_input():
         s = input()
         if not s:
             continue
+
+        try:
+            exec(s)
+            continue
+        except Exception:
+            pass
 
         try:
             user_id, *text = s.split()
@@ -133,35 +142,35 @@ def start(message: Message):
     elif message.text == '/my_id':
         send_message(user_id, str(user_id))
 
-    elif user_id in CLASSES.values():
-        *_, cur_class = sorted(i[0] for i in CLASSES.items() if i[1] == user_id)
+    elif user_id in LETTERS.values():
+        *_, letter = sorted(i[0] for i in LETTERS.items() if i[1] == user_id)
 
         if message.text == '/my_class':
             text = 'Список учеников вашего класса:\n\n'
-            students = [x for x in users if x != DELETED and users[x][CLASS] == cur_class]
-            max_length = max(len(users[i][NAME]) for i in students)
+            cur_class = [x for x in students if students[x][CLASS] == letter]
+            max_length = max(len(students[i][NAME]) for i in cur_class)
 
-            for n, student in enumerate(sorted(students, key=lambda x: users[x][NAME]), 1):
-                name = users[student][NAME].ljust(max_length)
+            for n, student in enumerate(sorted(cur_class, key=lambda x: students[x][NAME]), 1):
+                name = students[student][NAME].ljust(max_length)
                 name += ' ' * name.count(' ')
                 text += f"{n}. {name}" + f' id {student}\n'
 
             send_message(user_id, text)
 
         elif message.text == '/report':
-            send_report(clear=False, classes=[cur_class])
+            send_report(clear=False, classes=[letter])
 
         else:
             send_message(user_id, TEACHER_COMMANDS)
 
-    elif user_id not in users:
+    elif user_id not in students:
         send_message(user_id, 'Хочешь зарегистрироваться?',
                      reply_markup=make_bool_keyboard())
         bot.register_next_step_handler(message, if_register)
 
     elif message.text == '/permanently':
-        if not users[user_id].get(ALWAYS):
-            data = '\n'.join(f'{key}: {users[user_id][key]}' for key in [LUNCH, VISIT, REASON])
+        if not students[user_id].get(ALWAYS):
+            data = '\n'.join(f'{key}: {students[user_id][key]}' for key in [LUNCH, VISIT, REASON])
             send_message(user_id, f'''
 Твои данные не будут очищаться ежедневно, но каждую неделю всё равно придется писать подтверждение боту.
 Если ты не уверен, что всю неделю будешь следовать режиму, отключи эту функцию.
@@ -180,7 +189,7 @@ def start(message: Message):
     elif message.text == '/change_name':
         send_message(user_id, 'Введи новое имя. Имей в виду, что твой классный советник '
                               'будет уведомлен об изменении имени (/exit если вдруг передумал)',
-                     reply_markup=make_keyboard({get_fullname(message), users[user_id][NAME]}))
+                     reply_markup=make_keyboard({get_fullname(message), students[user_id][NAME]}))
         bot.register_next_step_handler(message, change_name)
 
     elif message.text == '/del_myself':
@@ -197,35 +206,33 @@ def start(message: Message):
         bot.register_next_step_handler(message, mailing)
 
     else:
-        if message.from_user.id in HUMANS:
-            send_message(user_id, f'Veux {"enregistrer" * (users[user_id][LUNCH] is None) or "modifier"}'
-                                  f' données pour demain?',
-                         reply_markup=make_france_bool_keyboard())
-        else:
-            send_message(user_id, f'Хочешь {"записать" * (users[user_id][LUNCH] is None) or "изменить"}'
-                                  f' данные {get_planning_day(need_date=False, na=True)}?',
-                         reply_markup=make_bool_keyboard())
-        bot.register_next_step_handler(message, get_if_want_to_change_data)
+        get_lunch(message)
+        # if message.from_user.id in HUMANS:
+        #     send_message(user_id, f'Veux {"enregistrer" * (students[user_id][LUNCH] is None) or "modifier"}'
+        #                           f' données pour demain?',
+        #                  reply_markup=make_france_bool_keyboard())
+        # else:
+        #     send_message(user_id, f'Хочешь {"записать" * (students[user_id][LUNCH] is None) or "изменить"}'
+        #                           f' данные {get_planning_day(need_date=False, na=True)}?',
+        #                  reply_markup=make_bool_keyboard())
+        # bot.register_next_step_handler(message, get_if_want_to_change_data)
 
 
 def mailing(message: Message):
     if log(message):
         return
 
-    for student in users:
-        # TODO:                                                СОЛНЦЕ
-        # Подправь или вообще убери текст, если хочешь
-        text = f'Сообщение от администратора всем пользователям:\n{message.text}'
-        send_message(student, text)
+    for student in students:
+        send_message(student, message.text)
 
 
 def make_permanently(message: Message):
     if log(message):
         return
 
-    data = users[message.from_user.id].get(ALWAYS, False)
+    data = students[message.from_user.id].get(ALWAYS, False)
     if message.text.lower() in POSITIVE:
-        users[message.from_user.id][ALWAYS] = not data
+        students[message.from_user.id][ALWAYS] = not data
         dump(users, USERS)
 
         send_message(message.from_user.id, 'Изменено.')
@@ -263,8 +270,8 @@ def del_user(message: Message):
         return
 
     if message.text.lower() in POSITIVE:
-        users[DELETED][message.from_user.id] = users[message.from_user.id]
-        del users[message.from_user.id]
+        deleted[message.from_user.id] = students[message.from_user.id].copy()
+        del students[message.from_user.id]
         dump(users, USERS)
 
         send_message(message.from_user.id, 'Очень жаль, что ты покидаешь нас. Прощай')
@@ -278,11 +285,12 @@ def change_name(message: Message):
     if log(message):
         return
 
-    user = users[message.from_user.id]
+    user = students[message.from_user.id]
     send_message(message.from_user.id, f'Имя {user[NAME]} изменено на {message.text}')
-    send_message(CLASSES[user[CLASS]], f'Имя ученика {user[NAME]} изменено на {message.text}')
+    send_message(LETTERS[user[CLASS]], f'Имя ученика {user[NAME]} было изменено на {message.text}')
+    log(f'Имя ученика {user[NAME]} было изменено на {message.text}', send_admin=True)
 
-    users[message.from_user.id][NAME] = message.text
+    students[message.from_user.id][NAME] = message.text
     dump(users, USERS)
 
 
@@ -320,11 +328,11 @@ def get_lunch(message: Message):
         return
 
     if message.text.lower() in POSITIVE:
-        users[message.from_user.id][LUNCH] = True
+        students[message.from_user.id][LUNCH] = True
         dump(users, USERS)
 
-        statistic[STUDENT].append((message.from_user.id, get_date(), dt.now().weekday() + 1, 1))
-        dump(statistic, STATISTIC)
+        statistic[STUDENTS].append((message.from_user.id, get_date(), dt.now().weekday() + 1, 1))
+        dump(format_json(statistic), STATISTIC)
 
         if message.from_user.id in GIRLS:
             send_message(message.from_user.id, 'Пизда')
@@ -343,8 +351,7 @@ def get_lunch(message: Message):
 
     else:
         send_message(message.from_user.id, 'Этот бот немножко тупой. Чтобы он тебя понимал, пожалуйста, '
-                                           'используй только ответы "да" и "нет".')
-        bot.register_next_step_handler(message, get_lunch)
+                                           'используй только ответы "Да" и "Нет".')
 
 
 def get_at_school(message: Message):
@@ -353,12 +360,12 @@ def get_at_school(message: Message):
         return
 
     if message.text.lower() in POSITIVE:
-        users[message.from_user.id][LUNCH] = False
-        users[message.from_user.id][VISIT] = True
+        students[message.from_user.id][LUNCH] = False
+        students[message.from_user.id][VISIT] = True
         dump(users, USERS)
 
-        statistic[STUDENT].append((message.from_user.id, get_date(), dt.now().weekday() + 1, 2))
-        dump(statistic, STATISTIC)
+        statistic[STUDENTS].append((message.from_user.id, get_date(), dt.now().weekday() + 1, 2))
+        dump(format_json(statistic), STATISTIC)
 
         if message.from_user.id in HUMANS:
             send_message(message.from_user.id, 'Enregistré!')
@@ -366,19 +373,19 @@ def get_at_school(message: Message):
             send_message(message.from_user.id, 'Записано!')
 
     elif message.text.lower() in NEGATIVE:
-        users[message.from_user.id][LUNCH] = False
-        users[message.from_user.id][VISIT] = False
+        students[message.from_user.id][LUNCH] = False
+        students[message.from_user.id][VISIT] = False
         dump(users, USERS)
 
-        statistic[STUDENT].append((message.from_user.id, get_date(), dt.now().weekday() + 1, 3))
-        dump(statistic, STATISTIC)
+        statistic[STUDENTS].append((message.from_user.id, get_date(), dt.now().weekday() + 1, 3))
+        dump(format_json(statistic), STATISTIC)
 
         if message.from_user.id in HUMANS:
             send_message(message.from_user.id, "S'il vous plaît donner une raison pour votre conseiller de classe",
-                         reply_markup=make_keyboard([users[message.from_user.id].get(REASON) or '']))
+                         reply_markup=make_keyboard([students[message.from_user.id].get(REASON) or '']))
         else:
             send_message(message.from_user.id, 'Пожалуйста, укажи причину для твоего классного советника.',
-                         reply_markup=make_keyboard([users[message.from_user.id].get(REASON) or '']))
+                         reply_markup=make_keyboard([students[message.from_user.id].get(REASON) or '']))
         bot.register_next_step_handler(message, get_no_school_reason)
 
     else:
@@ -397,7 +404,7 @@ def get_no_school_reason(message: Message):
         bot.register_next_step_handler(message, get_no_school_reason)
 
     else:
-        users[message.from_user.id][REASON] = message.text
+        students[message.from_user.id][REASON] = message.text
         dump(users, USERS)
 
         if message.from_user.id in HUMANS:
@@ -412,7 +419,7 @@ def if_register(message: Message):
         return
 
     if message.text.lower() in POSITIVE:
-        send_message(message.from_user.id, 'Выбери класс', reply_markup=make_keyboard(CLASSES))
+        send_message(message.from_user.id, 'Выбери класс', reply_markup=make_keyboard(LETTERS))
         bot.register_next_step_handler(message, register)
     else:
         send_message(message.from_user.id, 'Нет так нет')
@@ -426,17 +433,17 @@ def register(message: Message):
     user_id = message.from_user.id
     current_class = message.text.capitalize()
 
-    if current_class not in CLASSES:
+    if current_class not in LETTERS:
         send_message(user_id, 'Нет такого класса',
-                     reply_markup=make_keyboard(CLASSES))
+                     reply_markup=make_keyboard(LETTERS))
         bot.register_next_step_handler(message, register)
         return
 
     names = {get_fullname(message)}
-    if user_id in users[DELETED]:
-        names.add(users[DELETED][user_id][NAME])
+    if user_id in deleted:
+        names.add(deleted[user_id][NAME])
 
-        if current_class != users[DELETED][user_id][CLASS]:
+        if current_class != deleted[user_id][CLASS]:
             send_message(user_id, 'Имей в виду, что классному советнику выбранного тобой класса '
                                   'придет уведомление о твоей регистрации.')
 
@@ -460,10 +467,10 @@ def register_end(message: Message, name, class_letter):
     if log(message):
         return
 
-    global users
+    global students
 
     if message.text.lower() in POSITIVE:
-        users[message.from_user.id] = {
+        students[message.from_user.id] = {
             CLASS: class_letter,
             NAME: name,
             LUNCH: None,
@@ -471,16 +478,19 @@ def register_end(message: Message, name, class_letter):
             REASON: None
         }
 
-        if message.from_user.id in users[DELETED]:
-            del users[DELETED][message.from_user.id]
+        if message.from_user.id in deleted:
+            del deleted[message.from_user.id]
 
-        users = dict(sorted(users.items(), key=lambda x: (x[0] == DELETED, float(x[0]) if x[0] != DELETED else 0)))
+        d = dict(sorted(students.items(), key=lambda x: float(x[1][NAME])))
+        students.clear()
+        students += d
+
         dump(users, USERS)
 
         send_message(message.from_user.id, 'Ты успешно зарегистрирован!')
 
         try:
-            send_message(CLASSES[class_letter], f'Ученик с id {message.from_user.id}, назвавшийся "{name}", '
+            send_message(LETTERS[class_letter], f'Ученик с id {message.from_user.id}, назвавшийся "{name}", '
                                                 f'присоединился к вашему классу. Если это не ваш ученик, пожалуйста, '
                                                 f'сообщите имя и id этого пользователя администратору @chmorodinka')
         except telebot.apihelper.ApiException:
@@ -502,21 +512,21 @@ def send_notification(morning=False):
         log('send_notification was aborted', send_admin=True)
         return
 
-    for user_id in users:
-        if users[user_id].get(LUNCH, False) is None:
+    for user_id in students:
+        if students[user_id].get(LUNCH, False) is None:
             try:
                 ask_lunch(make_empty_message(user_id))
 
             except Exception as error:
                 if 'bot was blocked by the user' in str(error):
-                    # del users[user_id]
-                    error = f'Пользователь {users[user_id][NAME]} ({user_id}) заблокировал ' \
+                    # del students[user_id]
+                    error = f'Пользователь {students[user_id][NAME]} ({user_id}) заблокировал ' \
                             f'бота и (не) был удален.'
 
                 log(error, send_admin=True)
 
 
-def send_report(clear=False, classes=CLASSES):
+def send_report(clear=False, classes=LETTERS):
     log('send_report was called', send_admin=True)
 
     if len(classes) > 1 and dt.now().date() != get_planning_day(formatted=False, strong=True):
@@ -524,27 +534,27 @@ def send_report(clear=False, classes=CLASSES):
         return
 
     for let in classes:
-        cur_class = sorted(filter(lambda x: users[x].get(CLASS) == let, users), key=lambda x: users[x][NAME])
+        cur_class = sorted(filter(lambda x: students[x].get(CLASS) == let, students), key=lambda x: students[x][NAME])
 
         text = no_data = lunch = no_lunch = no_school = ''
         k = [0] * 4
 
         for student in cur_class:
-            if users[student][LUNCH] is None:
+            if students[student][LUNCH] is None:
                 k[0] += 1
-                no_data += f'{k[0]}. {users[student][NAME]}\n'
-            elif users[student][LUNCH]:
+                no_data += f'{k[0]}. {students[student][NAME]}\n'
+            elif students[student][LUNCH]:
                 k[1] += 1
-                lunch += f'{k[1]}. {users[student][NAME]}\n'
-            elif users[student][VISIT]:
+                lunch += f'{k[1]}. {students[student][NAME]}\n'
+            elif students[student][VISIT]:
                 k[2] += 1
-                no_lunch += f'{k[2]}. {users[student][NAME]}\n'
+                no_lunch += f'{k[2]}. {students[student][NAME]}\n'
             else:
                 k[3] += 1
-                no_school += f'{k[3]}. {users[student][NAME]}: ' \
-                             f'"{users[student].get(REASON) or "Причина не была указана."}"\n'
-            if clear and not users[student].get(ALWAYS):
-                users[student][LUNCH] = users[student][VISIT] = None
+                no_school += f'{k[3]}. {students[student][NAME]}: ' \
+                             f'"{students[student].get(REASON) or "Причина не была указана."}"\n'
+            if clear and not students[student].get(ALWAYS):
+                students[student][LUNCH] = students[student][VISIT] = None
         dump(users, USERS)
 
         if k[1]:
@@ -568,12 +578,12 @@ def send_report(clear=False, classes=CLASSES):
             text += no_data
 
         try:
-            send_message(CLASSES[let], text)
+            send_message(LETTERS[let], text)
             send_message(MAKSIM, text)
             send_message(SOPHIA, text)
 
             if clear:
-                statistic[CLASS].append((let, get_date(), dt.now().weekday() + 1) + tuple(k))
+                statistic[CLASSES].append((let, get_date(), dt.now().weekday() + 1) + tuple(k))
                 dump(format_json(statistic), STATISTIC)
         except telebot.apihelper.ApiException:
             log(f'Классный советник класса {let} не зарегистрирован!')
@@ -582,8 +592,8 @@ def send_report(clear=False, classes=CLASSES):
 def send_notification_about_permanently():
     log('send_notification_about_permanently was called', send_admin=True)
 
-    for student in users:
-        if users[student].get(ALWAYS):
+    for student in students:
+        if students[student].get(ALWAYS):
             send_message(student, 'Ты уверен, что всю следующую неделю будешь следовать режиму?',
                          reply_markup=make_bool_keyboard())
             bot.register_next_step_handler(make_empty_message(student), make_permanently)

@@ -8,8 +8,9 @@
   "408045956": {
     "class": "Йота",
     "name": "Соловьев Игорь",
-    "lunch": null,
-    "school_visit": null
+    "lunch": false,
+    "school_visit": false,
+    "reason": "Болезнь"
   },
   "519905246": {
     "class": "Йота",
@@ -79,7 +80,7 @@
   "1344741369": {
     "class": "Йота",
     "name": "Иванцова Аня",
-    "lunch": null,
+    "lunch": true,
     "school_visit": null
   },
   "1430032907": {
@@ -97,14 +98,14 @@
   "1868213058": {
     "class": "Йота",
     "name": "Абакановский Влад",
-    "lunch": null,
+    "lunch": true,
     "school_visit": null
   },
   "1883271571": {
     "class": "Йота",
     "name": "Муковозчик Артём",
-    "lunch": null,
-    "school_visit": null
+    "lunch": false,
+    "school_visit": true
   },
   "1987908012": {
     "class": "Йота",
