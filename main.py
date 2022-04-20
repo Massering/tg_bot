@@ -122,14 +122,6 @@ def start(message: Message):
         send_message(user_id, f'''
 Это бот ФМШ СФУ, созданный, чтобы опрашивать учеников, будут ли они обедать
 
-Данные записываются на ближайший учебный день. Данные можно изменить только до {REPORT_TIME} того же дня.
-В {REPORT_TIME} бот отправляет классному советнику всю информацию.
-После этого времени бот будет спрашивать данные на следующий учебный день.
-
-Также бот отправит вам напоминание в {EVENING_TIME} и в {MORNING_TIME}, если вы до сих пор не внесли данные
-
-Если вы классный советник, напишите "Я классный советник" и больше ничего не пишите, вам не нужно регистрироваться
-
 Создатель: Рудаков Максим из Йоты
 @chmorodinka
 ''')
@@ -141,27 +133,6 @@ def start(message: Message):
 
     elif message.text == '/my_id':
         send_message(user_id, str(user_id))
-
-    elif user_id in LETTERS.values():
-        *_, letter = sorted(i[0] for i in LETTERS.items() if i[1] == user_id)
-
-        if message.text == '/my_class':
-            text = 'Список учеников вашего класса:\n\n'
-            cur_class = [x for x in students if students[x][CLASS] == letter]
-            max_length = max(len(students[i][NAME]) for i in cur_class)
-
-            for n, student in enumerate(sorted(cur_class, key=lambda x: students[x][NAME]), 1):
-                name = students[student][NAME].ljust(max_length)
-                name += ' ' * name.count(' ')
-                text += f"{n}. {name}" + f' id {student}\n'
-
-            send_message(user_id, text)
-
-        elif message.text == '/report':
-            send_report(clear=False, classes=[letter])
-
-        else:
-            send_message(user_id, TEACHER_COMMANDS)
 
     elif user_id not in students:
         send_message(user_id, 'Хочешь зарегистрироваться?',
@@ -205,8 +176,29 @@ def start(message: Message):
                      reply_markup=make_bool_keyboard())
         bot.register_next_step_handler(message, mailing)
 
+    elif user_id in LETTERS.values():
+        *_, letter = sorted(i[0] for i in LETTERS.items() if i[1] == user_id)
+
+        if message.text == '/my_class':
+            text = 'Список учеников вашего класса:\n\n'
+            cur_class = [x for x in students if students[x][CLASS] == letter]
+            max_length = max(len(students[i][NAME]) for i in cur_class)
+
+            for n, student in enumerate(sorted(cur_class, key=lambda x: students[x][NAME]), 1):
+                name = students[student][NAME].ljust(max_length)
+                name += ' ' * name.count(' ')
+                text += f"{n}. {name}" + f' id {student}\n'
+
+            send_message(user_id, text)
+
+        elif message.text == '/report':
+            send_report(clear=False, classes=[letter])
+
+        else:
+            send_message(user_id, TEACHER_COMMANDS)
+
     else:
-        get_lunch(message)
+        get_lunch(message, from_start=True)
         # if message.from_user.id in HUMANS:
         #     send_message(user_id, f'Veux {"enregistrer" * (students[user_id][LUNCH] is None) or "modifier"}'
         #                           f' données pour demain?',
@@ -272,6 +264,9 @@ def del_user(message: Message):
     if message.text.lower() in POSITIVE:
         deleted[message.from_user.id] = students[message.from_user.id].copy()
         del students[message.from_user.id]
+
+        users[STUDENTS] = students
+        users[DELETED] = deleted
         dump(users, USERS)
 
         send_message(message.from_user.id, 'Очень жаль, что ты покидаешь нас. Прощай')
@@ -322,9 +317,9 @@ def ask_lunch(message: Message):
     bot.register_next_step_handler(message, get_lunch)
 
 
-def get_lunch(message: Message):
+def get_lunch(message: Message, from_start=False):
     """Изначальная функция, получающая данные пользователя"""
-    if log(message):
+    if not from_start and log(message):
         return
 
     if message.text.lower() in POSITIVE:
@@ -350,8 +345,8 @@ def get_lunch(message: Message):
         bot.register_next_step_handler(message, get_at_school)
 
     else:
-        send_message(message.from_user.id, 'Этот бот немножко тупой. Чтобы он тебя понимал, пожалуйста, '
-                                           'используй только ответы "Да" и "Нет".')
+        send_message(message.from_user.id, f'Пиши "Да", если будешь обедать {get_planning_day()} и "Нет" иначе',
+                     reply_markup=make_bool_keyboard())
 
 
 def get_at_school(message: Message):
@@ -481,10 +476,8 @@ def register_end(message: Message, name, class_letter):
         if message.from_user.id in deleted:
             del deleted[message.from_user.id]
 
-        d = dict(sorted(students.items(), key=lambda x: float(x[1][NAME])))
-        students.clear()
-        students += d
-
+        users[STUDENTS] = students = dict(sorted(students.items(), key=lambda x: x[1][NAME]))
+        users[DELETED] = deleted
         dump(users, USERS)
 
         send_message(message.from_user.id, 'Ты успешно зарегистрирован!')
@@ -527,14 +520,17 @@ def send_notification(morning=False):
 
 
 def send_report(clear=False, classes=LETTERS):
-    log('send_report was called', send_admin=True)
+    if len(classes) > 1:
+        log('send_report was called', send_admin=True)
+    else:
+        log(f'send_report for {classes[0]} was called', send_admin=True)
 
     if len(classes) > 1 and dt.now().date() != get_planning_day(formatted=False, strong=True):
         log('send_report was aborted', send_admin=True)
         return
 
     for let in classes:
-        cur_class = sorted(filter(lambda x: students[x].get(CLASS) == let, students), key=lambda x: students[x][NAME])
+        cur_class = sorted([x for x in students if students[x][CLASS] == let], key=lambda x: students[x][NAME])
 
         text = no_data = lunch = no_lunch = no_school = ''
         k = [0] * 4
@@ -558,7 +554,7 @@ def send_report(clear=False, classes=LETTERS):
         dump(users, USERS)
 
         if k[1]:
-            text += f"{get_planning_day().capitalize()} {reform('будет', k[1])} обедать {k[1]} " \
+            text += f"{get_planning_day().capitalize()} {reform('будут', k[1])} обедать {k[1]} " \
                     f"{reform('ученик', k[1])} класса {let}:\n"
             text += lunch
         else:
@@ -596,12 +592,14 @@ def send_notification_about_permanently():
         if students[student].get(ALWAYS):
             send_message(student, 'Ты уверен, что всю следующую неделю будешь следовать режиму?',
                          reply_markup=make_bool_keyboard())
+            # TODO: Хрень с Да и Нет
             bot.register_next_step_handler(make_empty_message(student), make_permanently)
 
 
 def run_schedule():
     schedule.every().day.at(MORNING_TIME).do(send_message, SOPHIA, 'Доброе утро, солнце, удачного дня💕')
     schedule.every().day.at(MORNING_TIME).do(send_message, MAKSIM, 'Доброе утро, удачного дня.')
+
     schedule.every().day.at(MORNING_TIME).do(send_notification, morning=True)
     schedule.every().day.at(REPORT_TIME).do(send_report, clear=True)
     schedule.every().day.at(EVENING_TIME).do(send_notification)
