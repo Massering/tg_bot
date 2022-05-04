@@ -1,12 +1,17 @@
 import os
 from time import sleep
 
+# Чтобы адекватно называть получаемые ошибки, связанные с подключением
 from requests import exceptions
+# Всё действие во времени через библиотеку schedule
 import schedule
+# В программе используется разделение на потоки
 from threading import Thread
 
+# Сама библиотека взаимодействия с ботом
 import telebot
 
+# Функции и константы из других файлов
 from engine import *
 from config import *
 
@@ -91,9 +96,6 @@ def log(message, starting=False, send_admin=False, to_file=False):
         name += f' (id {message.from_user.id})'
         text = f'{get_date()} - {name}: "{message.text}"'
         print(text)
-
-        if 'я' in message.text.lower() and 'советник' in message.text.lower():
-            send_message(MAKSIM, text)
 
         if message.text.lower() == '/exit':
             send_message(message.from_user.id, 'Выход из сценария')
@@ -414,7 +416,8 @@ def if_register(message: Message):
         return
 
     if message.text.lower() in POSITIVE:
-        send_message(message.from_user.id, 'Выбери класс', reply_markup=make_keyboard(LETTERS))
+        send_message(message.from_user.id, 'Выбери класс', reply_markup=make_keyboard([*LETTERS] +
+                                                                                      ['Классные советники']))
         bot.register_next_step_handler(message, register)
     else:
         send_message(message.from_user.id, 'Нет так нет')
@@ -427,6 +430,12 @@ def register(message: Message):
 
     user_id = message.from_user.id
     current_class = message.text.capitalize()
+
+    if current_class == 'Классные советники':
+        name = get_fullname(message) + f' (id {message.from_user.id})'
+        log(f'Пользователь {name} причисляет себя к классным советникам', send_admin=True)
+        send_message(user_id, 'Спасибо, ваш id был отправлен администратору.', reply_markup=make_keyboard(LETTERS))
+        return
 
     if current_class not in LETTERS:
         send_message(user_id, 'Нет такого класса',
@@ -497,10 +506,10 @@ def register_end(message: Message, name, class_letter):
         send_message(message.from_user.id, 'Регистрация отменена')
 
 
-def send_notification(morning=False):
+def send_notification(morning=False, friday=False):
     log('send_notification was called', send_admin=True)
 
-    if morning and dt.now().date() != get_planning_day(formatted=False) or \
+    if not friday and morning and dt.now().date() != get_planning_day(formatted=False) or \
             not morning and (dt.now() + td(days=1)).date() != get_planning_day(formatted=False):
         log('send_notification was aborted', send_admin=True)
         return
@@ -525,7 +534,7 @@ def send_report(clear=False, classes=LETTERS):
     else:
         log(f'send_report for {classes[0]} was called', send_admin=True)
 
-    if len(classes) > 1 and dt.now().date() != get_planning_day(formatted=False, strong=True):
+    if len(classes) > 1 and dt.now().weekday() != 4 and dt.now().date() != get_planning_day(formatted=False, strong=True):
         log('send_report was aborted', send_admin=True)
         return
 
@@ -600,9 +609,30 @@ def run_schedule():
     schedule.every().day.at(MORNING_TIME).do(send_message, SOPHIA, 'Доброе утро, солнце, удачного дня💕')
     schedule.every().day.at(MORNING_TIME).do(send_message, MAKSIM, 'Доброе утро, удачного дня.')
 
-    schedule.every().day.at(MORNING_TIME).do(send_notification, morning=True)
-    schedule.every().day.at(REPORT_TIME).do(send_report, clear=True)
-    schedule.every().day.at(EVENING_TIME).do(send_notification)
+    schedule.every().monday.at(MORNING_TIME).do(send_notification, morning=True)
+    schedule.every().monday.at(REPORT_TIME).do(send_report, clear=True)
+    schedule.every().monday.at(EVENING_TIME).do(send_notification)
+
+    schedule.every().tuesday.at(MORNING_TIME).do(send_notification, morning=True)
+    schedule.every().tuesday.at(REPORT_TIME).do(send_report, clear=True)
+    schedule.every().tuesday.at(EVENING_TIME).do(send_notification)
+
+    schedule.every().wednesday.at(MORNING_TIME).do(send_notification, morning=True)
+    schedule.every().wednesday.at(REPORT_TIME).do(send_report, clear=True)
+    schedule.every().wednesday.at(EVENING_TIME).do(send_notification)
+
+    schedule.every().thursday.at(MORNING_TIME).do(send_notification, morning=True)
+    schedule.every().thursday.at(REPORT_TIME).do(send_report, clear=True)
+    schedule.every().thursday.at(EVENING_TIME).do(send_notification)
+
+    schedule.every().friday.at(MORNING_TIME).do(send_notification, morning=True)
+    schedule.every().friday.at(REPORT_TIME).do(send_report, clear=True)
+
+    for time in FRIDAY_TIMES:
+        schedule.every().friday.at(time).do(send_notification)
+    schedule.every().friday.at(FRIDAY_REPORT_TIME).do(send_report, clear=True)
+
+    schedule.every().sunday.at(EVENING_TIME).do(send_notification)
 
     schedule.every().sunday.at(EVENING_TIME).do(send_notification_about_permanently)
 
