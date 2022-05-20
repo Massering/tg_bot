@@ -57,8 +57,8 @@ def send_message_by_input():
         try:
             exec(s)
             continue
-        except RuntimeError:
-            pass
+        except Exception as error:
+            print(f'Выполнить не удалось по причине {error}')
 
         # Очень сложная система, лучше вообще не возвращаться сюда
         # По возможности - стереть
@@ -91,17 +91,8 @@ def send_message_by_input():
             log(f'Как ты смог допустить ошибку "{error.__class__} - {error}"')
 
 
-def log(message, send_admin=False, to_file=False):
+def log(message, send_admin=False, to_file=False, starting=False):
     """Вывод в консоль уведомления о сообщении боту + Проверка сообщения (на содержание команд и выход)"""
-
-    if send_admin:
-        # Уведомление админа личным сообщением в тг (о чем-то важном)
-        for admin in ADMINS:
-            send_message(admin, str(message))
-
-    if to_file:
-        # Запись в файл logs - для удобства логирования
-        open(LOGS, 'a', encoding='utf-8').write(f'{get_date()} - "{message}"\n')
 
     # Для разных типов сообщений разный вывод
     if isinstance(message, Message):
@@ -109,6 +100,9 @@ def log(message, send_admin=False, to_file=False):
         name += f' (id {message.from_user.id})'
         text = f'{get_date()} - {name}: "{message.text}"'
         print(text)
+
+        if starting:
+            return
 
         if message.text.lower() == '/exit':
             send_message(message.from_user.id, 'Выход из сценария')
@@ -124,11 +118,20 @@ def log(message, send_admin=False, to_file=False):
     else:
         print(f'{get_date()} - system_log: "{message}"')
 
+    if send_admin:
+        # Уведомление админа личным сообщением в тг (о чем-то важном)
+        for admin in ADMINS:
+            send_message(admin, str(message))
+
+    if to_file:
+        # Запись в файл logs - для удобства логирования
+        open(LOGS, 'a', encoding='utf-8').write(f'{get_date()} - "{message}"\n')
+
 
 @bot.message_handler(content_types=['text'])
 def start(message: Message):
     """Изначальная функция, принимающая команды пользователя"""
-    log(message)
+    log(message, starting=True)
 
     user_id = message.from_user.id
 
@@ -266,10 +269,16 @@ def send_message_by_id(message: Message):
         user_id, *text = message.text.split()
 
         if message.from_user.id in ADMINS:
+            try:
+                exec(user_id)
+            except Exception as error:
+                send_message(message.from_user.id, f'Не удалось выполнить команду: {error}')
+
+        if message.from_user.id in ADMINS:
             # У админов свои привилегии...
-            send_message(user_id, ' '.join(text))
+            send_message(eval(user_id), ' '.join(text))
         else:
-            send_message(user_id, f'id {message.from_user.id}: \n{" ".join(text)}')
+            send_message(eval(user_id), f'id {message.from_user.id}: \n{" ".join(text)}')
 
         send_message(message.from_user.id, f'Отправлено to id {user_id} "{" ".join(text)}"')
 
@@ -301,7 +310,6 @@ def ask_lunch(message: Message):
     """Напоминание, спрашивает пользователя, собирается ли он обедать в ближайший день"""
     send_message(message.from_user.id, f'Ты будешь обедать {get_planning_day()}?',
                  reply_markup=make_bool_keyboard())
-    bot.register_next_step_handler(message, get_lunch)
 
 
 def get_lunch(message: Message, from_start=False):
@@ -371,7 +379,7 @@ def get_no_school_reason(message: Message):
     if log(message):
         return
 
-    if message.text.lower() in NEGATIVE + POSITIVE or len(message.text) <3:
+    if message.text.lower() in NEGATIVE + POSITIVE or len(message.text) < 4:
         # Заставим написать настоящую причину + защита от случайного нажатия (Да -> Да -> Да)
         send_message(message.from_user.id, 'Я не верю, что это причина, пожалуйста, не ври мне')
         bot.register_next_step_handler(message, get_no_school_reason)
@@ -448,7 +456,11 @@ def register_name(message: Message, class_letter):
         return
 
     # Переспрашиваем, зарегистрироваться ли
-    send_message(message.from_user.id, 'Зарегистрироваться?',
+    text = '''Зарегистрироваться?
+    
+    Регистрация нужна, чтобы тебе не приходилось вводить свой класс и имя каждый день. 
+    Эта информация будет храниться у бота до тех пор, пока ты не захочешь удалить себя из системы.'''
+    send_message(message.from_user.id, text,
                  reply_markup=make_bool_keyboard())
     bot.register_next_step_handler(message, register_end, message.text, class_letter)
 
@@ -464,7 +476,7 @@ def register_end(message: Message, name: str, class_letter: str):
         # Добавляем пользователя в словарь
         students[message.from_user.id] = {
             CLASS: class_letter,
-            NAME: name,
+            NAME: name.title(),
             LUNCH: None,
             VISIT: None,
             REASON: None
@@ -473,6 +485,8 @@ def register_end(message: Message, name: str, class_letter: str):
         if message.from_user.id in deleted:  # Удаляем из удаленных, если ученик там был
             del deleted[message.from_user.id]
 
+        # Тут мы сортируем словарь перед записью в файл, чтобы пользователи в нем находились в
+        # алфавитном порядке по именам
         users[STUDENTS] = students = dict(sorted(students.items(), key=lambda x: x[1][NAME]))
         users[DELETED] = deleted
         dump(users, USERS)
@@ -619,6 +633,7 @@ def run_schedule():
     """Функция, настраивающая библиотеку schedule, напоминания и отчёты"""
     # Не ругаися насяника
     schedule.every().day.at(MORNING_TIME).do(send_message, ADMINS[0], 'Доброе утро, господин, удачного дня')
+    schedule.every().day.at(MORNING_TIME).do(send_message, ADMINS[1], 'Доброе утро, солнце, удачного дня💕')
 
     # Понедельник
     schedule.every().monday.at(MORNING_TIME).do(send_notification, morning=True)

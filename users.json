@@ -6,17 +6,73 @@
       "lunch": null,
       "school_visit": null
     },
+    "1024648481": {
+      "class": "Эта",
+      "name": "Байдалиев Темирлан",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
     "1430032907": {
       "class": "Йота",
       "name": "Барон Владислав",
       "lunch": null,
       "school_visit": null
     },
+    "679548535": {
+      "class": "Эта",
+      "name": "Баталов Илья",
+      "lunch": true,
+      "school_visit": null,
+      "reason": null
+    },
+    "1181901613": {
+      "class": "Эта",
+      "name": "Бравая Елизавета",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
     "1165447922": {
       "class": "Йота",
       "name": "Бухтоярова Анастасия",
       "lunch": null,
       "school_visit": null
+    },
+    "1263832945": {
+      "class": "Эта",
+      "name": "Потыкайлова Вероника",
+      "lunch": null,
+      "school_visit": null,
+      "reason": "Наполовину пар пойду, остальное буду на Экохакатоне"
+    },
+    "1397077808": {
+      "class": "Эта",
+      "name": "Верхотуров Светозар",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1388053892": {
+      "class": "Эта",
+      "name": "Веряскин Кирилл",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1891091253": {
+      "class": "Эта",
+      "name": "Казакова Влада",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1618464557": {
+      "class": "Эта",
+      "name": "Горбань Дмитрий",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
     },
     "1165152297": {
       "class": "Йота",
@@ -25,11 +81,32 @@
       "school_visit": null,
       "reason": null
     },
+    "885136819": {
+      "class": "Эта",
+      "name": "Зиганшина Алина",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1683394735": {
+      "class": "Эта",
+      "name": "Зинатулин Максим",
+      "lunch": null,
+      "school_visit": null,
+      "reason": "Семейные обстоятельства"
+    },
     "1344741369": {
       "class": "Йота",
       "name": "Иванцова Аня",
       "lunch": null,
       "school_visit": null
+    },
+    "1997463532": {
+      "class": "Эта",
+      "name": "Кожура Илья",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
     },
     "700026795": {
       "class": "Йота",
@@ -43,12 +120,26 @@
       "lunch": null,
       "school_visit": null
     },
+    "1503984259": {
+      "class": "Эта",
+      "name": "Колпаков Иван",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1433744803": {
+      "class": "Эта",
+      "name": "Шмидт Маргарита",
+      "lunch": null,
+      "school_visit": null,
+      "reason": "уезжаю домой"
+    },
     "1061139622": {
       "class": "Йота",
       "name": "Марьясов Владимир",
       "lunch": null,
       "school_visit": null,
-      "reason": "уехал в лагерь"
+      "reason": "Уехал домой"
     },
     "1883271571": {
       "class": "Йота",
@@ -63,11 +154,25 @@
       "school_visit": null,
       "reason": "Уезжаю на конференцию"
     },
+    "788729669": {
+      "class": "Эта",
+      "name": "Нестреляева Виктория",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
     "1214822760": {
       "class": "Йота",
       "name": "Очирова Арюна",
       "lunch": null,
       "school_visit": null
+    },
+    "1509494385": {
+      "class": "Эта",
+      "name": "Понасенко Александр",
+      "lunch": null,
+      "school_visit": null,
+      "reason": "Приболел"
     },
     "603377678": {
       "class": "Йота",
@@ -85,31 +190,66 @@
     "2078652234": {
       "class": "Йота",
       "name": "Ровняго Дмитрий",
-      "lunch": null,
+      "lunch": true,
       "school_visit": null,
       "reason": "Болею"
+    },
+    "827790445": {
+      "class": "Эта",
+      "name": "Рожков Анатолий",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "809423690": {
+      "class": "Эта",
+      "name": "Романченко Софья",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
     },
     "1089524173": {
       "class": "Йота",
       "name": "Рудаков Максим",
-      "lunch": true,
+      "lunch": null,
       "school_visit": null,
-      "reason": "Я буду на дистанционном интенсиве Rucode 5.0",
+      "reason": "Я буду на Эко-Хакатоне, зачёт пишу",
       "permanently": false
+    },
+    "1110786320": {
+      "class": "Эта",
+      "name": "Садовский Виктор",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1641475130": {
+      "class": "Эта",
+      "name": "Слугин Максим",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
     },
     "979923466": {
       "class": "Йота",
       "name": "Совкова София",
-      "lunch": true,
+      "lunch": null,
       "school_visit": null,
-      "reason": "буду на 13 элементе"
+      "reason": "Я буду на Эко-Хакатоне, зачёт пишу"
     },
     "408045956": {
       "class": "Йота",
       "name": "Соловьев Игорь",
       "lunch": null,
       "school_visit": null,
-      "reason": "Болезнь"
+      "reason": "По семейным причинам"
+    },
+    "1279274762": {
+      "class": "Эта",
+      "name": "Хорошилов Никита",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
     },
     "1831580928": {
       "class": "Йота",
@@ -121,7 +261,8 @@
       "class": "Йота",
       "name": "Юргельян Нина",
       "lunch": null,
-      "school_visit": null
+      "school_visit": null,
+      "reason": "Буду на экохакатоне, на зачёты приду"
     },
     "1987908012": {
       "class": "Йота",

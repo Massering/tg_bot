@@ -12,7 +12,7 @@ morph = pymorphy2.MorphAnalyzer()
 
 def get_date() -> str:
     """Получение строки с датой и временем сейчас"""
-    return dt.now().strftime("%y.%m.%d %H:%M:%S")
+    return dt.now().strftime("%d.%m.%Y %H:%M:%S")
 
 
 def get_planning_day(formatted=True, need_date=True, na=False, strong=False, need_weekday=True) -> Union[str, date]:
