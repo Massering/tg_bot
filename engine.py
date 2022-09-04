@@ -1,12 +1,12 @@
 from telebot.types import *
-# Нереализованная фича с вариантами вопросов
+# Нереализованная идея с вариантами вопросов
 # from random import choice
 from datetime import datetime as dt, timedelta as td, date
 import pymorphy2
 
 from config import *
 
-# Чтобы изменять слова
+# Чтобы изменять слова по числительным
 morph = pymorphy2.MorphAnalyzer()
 
 
@@ -15,38 +15,28 @@ def get_date() -> str:
     return dt.now().strftime("%d.%m.%Y %H:%M:%S")
 
 
-def get_planning_day(formatted=True, need_date=True, na=False, strong=False, need_weekday=True) -> Union[str, date]:
+def get_planning_day(formatted=True, need_date=True, na=False, need_weekday=True, strong=0) -> Union[str, date]:
     """Получение строки с датой и временем, на которые будут записаны данные"""
     # Возможно, стоит разделить эту функцию на много разных, каждая из которых будет отвечать за свой параметр
     # И вызывать эту, но только для получения даты в формате datetime
 
     months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
               'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря']
-    next_days = ['сегодня', 'завтра']
     weekdays = ['понедельник', 'вторник', 'среду', 'четверг', 'пятницу', 'субботу', 'воскресенье']
-    v_weekdays = [['в ', 'во '][day[:2] == 'вт'] + day for day in weekdays] + next_days
-    na_weekdays = ['на ' + day for day in weekdays + next_days]
+    v_weekdays = [['в ', 'во '][day == 'вторник'] + day for day in weekdays]
+    na_weekdays = ['на ' + day for day in weekdays]
 
     # Дата сейчас
     now = dt.now()
     report_time = now.replace(**dict(zip(['hour', 'minute'], map(int, REPORT_TIME.split(':')))))
-    delta = now > report_time + td(hours=strong)    # Если время после 8:00, запись уже на следующий день
 
-    while (now + td(days=delta)).strftime('%d.%m') in HOLIDAYS or (now + td(days=delta)).weekday() == 6:
-        delta += 1
+    #         ПН    ВТ    СР    ЧТ    ПТ    СБ   ВС
+    delta = [1, 2, 1, 2, 1, 2, 1, 2, 1, 3, 2, 3, 2, 2][now.weekday() * 2 + (now > report_time + td(hours=strong))]
 
     planning_date = now + td(days=delta)
 
     if not formatted:   # Бывает, что нужна именно дата в типе date
         return planning_date.date()
-
-    # if delta == 0:  # Значит можно заменить на "сегодня"
-    #     weekday = [v_weekdays, na_weekdays][na][-2]
-    # elif delta == 1:  # Значит можно заменить на "завтра"
-    #     weekday = [v_weekdays, na_weekdays][na][-1]
-    # else:
-    #
-    # Но пользователям фича не понравилась
 
     weekday = [v_weekdays, na_weekdays][na][planning_date.weekday()]
 
