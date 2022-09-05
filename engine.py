@@ -10,9 +10,14 @@ from config import *
 morph = pymorphy2.MorphAnalyzer()
 
 
+def get_now() -> dt:
+    """Получение даты и времени сейчас. Используется везде вместо dt.now() чтобы имитировать другой день"""
+    return dt.now() + td(days=0)
+
+
 def get_date() -> str:
     """Получение строки с датой и временем сейчас"""
-    return dt.now().strftime("%d.%m.%Y %H:%M:%S")
+    return get_now().strftime("%y.%m.%d %H:%M:%S")
 
 
 def get_planning_day(formatted=True, need_date=True, na=False, need_weekday=True, strong=0) -> Union[str, date]:
@@ -27,11 +32,14 @@ def get_planning_day(formatted=True, need_date=True, na=False, need_weekday=True
     na_weekdays = ['на ' + day for day in weekdays]
 
     # Дата сейчас
-    now = dt.now()
+    now = get_now()
     report_time = now.replace(**dict(zip(['hour', 'minute'], map(int, REPORT_TIME.split(':')))))
+    friday_report_time = now.replace(**dict(zip(['hour', 'minute'], map(int, FRIDAY_REPORT_TIME.split(':')))))
 
     #         ПН    ВТ    СР    ЧТ    ПТ    СБ   ВС
-    delta = [1, 2, 1, 2, 1, 2, 1, 2, 1, 3, 2, 3, 2, 2][now.weekday() * 2 + (now > report_time + td(hours=strong))]
+    delta = [1, 2, 1, 2, 1, 2, 1, 2, 1, 4, 3, 3, 2, 2][now.weekday() * 2 + (now > report_time + td(minutes=strong * 5))]
+    if now.weekday() == 4 and report_time + td(minutes=strong * 5) < now < friday_report_time:
+        delta -= 1
 
     planning_date = now + td(days=delta)
 
@@ -67,10 +75,13 @@ def make_keyboard(values: iter, one_time=True) -> ReplyKeyboardMarkup:
     return keyboard
 
 
-def get_fullname(message: Message) -> str:
+def get_fullname(message: Message, students: dict, user_id=False) -> str:
     """Возвращает ФИ пользователя, под которыми он зарегистрирован в Телеграмм"""
-    name = (message.from_user.last_name or ' ') + ' ' + message.from_user.first_name
-    return name.strip().title()
+    if message.from_user.id in students:
+        name = students[message.from_user.id]['name']
+    else:
+        name = (message.from_user.last_name or ' ') + ' ' + message.from_user.first_name
+    return name.strip().title() + f' (id {message.from_user.id})' * user_id
 
 
 def reform(word: str, main_word: int) -> str:
@@ -79,7 +90,7 @@ def reform(word: str, main_word: int) -> str:
     return word_form.make_agree_with_number(main_word).word
 
 
-def make_empty_message(chat_id: int) -> Message:
+def create_message(chat_id: int) -> Message:
     """Создание (имитация) пустого сообщения от пользователя"""
     # Кажется, этого не было задумано в этой библиотеке
 

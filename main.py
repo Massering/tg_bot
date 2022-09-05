@@ -41,7 +41,16 @@ def send_message(user_id: int, text: str, reply_markup=None):
     text = text.strip()
     # Помечаем в консоль отправку
     log((text, user_id))
-    bot.send_message(user_id, text, reply_markup=reply_markup)
+    try:
+        bot.send_message(user_id, text, reply_markup=reply_markup)
+    except Exception as error:
+        if 'chat not found' in str(error):
+            if user_id in students:
+                error = f'Ученик {get_fullname(create_message(user_id), students, user_id=True)}'
+            elif user_id in LETTERS.values():
+                error = f'Учитель id {user_id}'
+            error += f' всё ещё не написал боту!'
+        log(error, send_admin=True, to_file=True)
 
 
 def send_message_by_input():
@@ -57,7 +66,7 @@ def send_message_by_input():
         try:
             exec(s)
             continue
-        except RuntimeError:
+        except (RuntimeError, SyntaxError, UnicodeDecodeError):
             pass
 
         # Очень сложная система, лучше вообще не возвращаться сюда
@@ -101,12 +110,16 @@ def log(message, send_admin=False, to_file=False):
 
     if to_file:
         # Запись в файл logs - для удобства логирования
-        open(LOGS, 'a', encoding='utf-8').write(f'{get_date()} - "{message}"\n')
+        with open(LOGS, 'a', encoding='utf-8') as log_file:
+            log_file.write(f'{get_date()} - "{message}"\n')
 
     # Для разных типов сообщений разный вывод
     if isinstance(message, Message):
-        name = get_fullname(message)
-        name += f' (id {message.from_user.id})'
+        if message.text is None:
+            start_with_media(message)
+            return 1
+
+        name = get_fullname(message, students, user_id=True)
         text = f'{get_date()} - {name}: "{message.text}"'
         print(text)
 
@@ -126,8 +139,8 @@ def log(message, send_admin=False, to_file=False):
 
 
 @bot.message_handler(content_types=['photo', 'document', 'audio'])
-def f(message: Message):
-    bot.forward_message(1089524173, message.from_user.id, message.id)
+def start_with_media(message: Message):
+    bot.forward_message(ADMINS[0], message.from_user.id, message.id)
     send_message(message.from_user.id, 'Я не знаю, как с этим обращаться')
 
 
@@ -148,7 +161,7 @@ def start(message: Message):
                          reply_markup=make_bool_keyboard())
             bot.register_next_step_handler(message, if_register)
         else:
-            send_message(user_id, 'Ты уже зарегистрирован в системе!', reply_markup=make_bool_keyboard())
+            send_message(user_id, 'Ты уже зарегистрирован в системе!')
 
     elif message.text == '/send_message':
         # Функция, чтобы отправлять другому пользователю сообщение, зная его id
@@ -160,8 +173,7 @@ def start(message: Message):
     elif message.text == '/mailing' and user_id in ADMINS + [*LETTERS.values()]:
         # Рассылка от имени бота ВСЕМ зарегистрированным ученикам
         # Только для администраторов (и классных советников)
-        send_message(user_id, 'Введи сообщение, но будь аккуратен, это пошлётся всем',
-                     reply_markup=make_bool_keyboard())
+        send_message(user_id, 'Введите сообщение. Будьте аккуратны, это сообщение будет отправлено всем Вашим ученикам')
         bot.register_next_step_handler(message, mailing)
 
     elif user_id in LETTERS.values():
@@ -191,8 +203,9 @@ def start(message: Message):
             send_message(user_id, '''
 Список команд классных советников:
 /my_class - получить список учеников моего класса
-/report - получить информацию вневременно
+/report - получить отчет о собранной на данный момент информации
 ''')
+            bot.forward_message(ADMINS[0], message.from_user.id, message.id)
 
     elif user_id not in students:  # Если ученик не зарегистрирован, предлагаем сделать это
         send_message(user_id, 'Хочешь зарегистрироваться?',
@@ -242,9 +255,15 @@ def mailing(message: Message):
     if log(message):  # Если сообщение содержит информацию о выходе, прекращаем работу
         return
 
+    if message.from_user.id in LETTERS:
+        let = [i[0] for i in LETTERS if LETTERS[i] == message.from_user.id]
+    else:
+        let = ''
+
     # Можно добавить фильтр по классам...
     for student in students:
-        send_message(student, message.text)
+        if let in students[student][CLASS]:
+            send_message(student, message.text)
 
 
 def make_permanently(message: Message):
@@ -325,7 +344,7 @@ def get_lunch(message: Message, from_start=False):
         dump(users, USERS)
 
         # Запись статистики (id, дата, день недели, режим (1 - буду обедать))
-        # statistic[STUDENTS].append((message.from_user.id, get_date(), dt.now().weekday() + 1, 1))
+        # statistic[STUDENTS].append((message.from_user.id, get_date(), get_now().weekday() + 1, 1))
         # dump(format_json(statistic), STATISTIC)
 
         send_message(message.from_user.id, 'Записано!')
@@ -353,7 +372,7 @@ def get_at_school(message: Message):
         dump(users, USERS)
 
         # Запись статистики (id, дата, день недели, режим (2 - не буду обедать, но буду в школе))
-        # statistic[STUDENTS].append((message.from_user.id, get_date(), dt.now().weekday() + 1, 2))
+        # statistic[STUDENTS].append((message.from_user.id, get_date(), get_now().weekday() + 1, 2))
         # dump(format_json(statistic), STATISTIC)
 
         send_message(message.from_user.id, 'Записано!')
@@ -364,7 +383,7 @@ def get_at_school(message: Message):
         dump(users, USERS)
 
         # Запись статистики (id, дата, день недели, режим (3 - не буду в школе, соответственно не буду обедать))
-        # statistic[STUDENTS].append((message.from_user.id, get_date(), dt.now().weekday() + 1, 3))
+        # statistic[STUDENTS].append((message.from_user.id, get_date(), get_now().weekday() + 1, 3))
         # dump(format_json(statistic), STATISTIC)
 
         send_message(message.from_user.id, 'Пожалуйста, укажи причину для твоего классного советника.',
@@ -417,8 +436,14 @@ def register(message: Message, class_management=False):
     current_class = message.text
 
     if class_management:
+        if current_class not in LETTERS:
+            send_message(user_id, 'Такого класса не найдено. Попробуйте ещё раз',
+                         reply_markup=make_keyboard(LETTERS))
+            bot.register_next_step_handler(message, register)
+            return
+
         # Выбор для тех, кто сказал, что он классный советник в прошлый раз
-        name = get_fullname(message) + f' (id {message.from_user.id})'
+        name = get_fullname(message, students, user_id=True)
         log(f'Пользователь {name} утверждает, что он советник класса {current_class}', send_admin=True)
         send_message(user_id, 'Спасибо, Ваш id был отправлен администратору.')
         return
@@ -431,12 +456,12 @@ def register(message: Message, class_management=False):
 
     if current_class not in LETTERS:
         send_message(user_id, 'Такого класса не найдено. Попробуй ещё раз',
-                     reply_markup=make_keyboard([*LETTERS] + ['Классные советники']))
+                     reply_markup=make_keyboard([*LETTERS] + ['Я - классный советник']))
         bot.register_next_step_handler(message, register)
         return
 
     # Имя пользователя в Телеграм и, если есть, от прошлой регистрации
-    names = {get_fullname(message)}
+    names = {get_fullname(message, {})}
     if user_id in deleted:
         names.add(deleted[user_id][NAME])
 
@@ -503,20 +528,20 @@ def register_end(message: Message, name: str, class_letter: str):
         send_message(message.from_user.id, 'Чтобы бот тебя понимал, пожалуйста, используй только ответы "да" и "нет"')
 
 
-def send_notification(morning=False, friday=False):
+def send_notification():
     """Функция оповещения учеников, всё ещё не сделавших свой выбор (по вечерам это почти все)"""
     log('send_notification was called', send_admin=True)  # Оповещаем админа (допустимо отключить...)
 
     # Эта жуть здесь, чтобы функция не вызывалась по праздникам и выходным. Хорошо бы переделать...
-    if (not friday and morning and dt.now().date() != get_planning_day(formatted=False)) or \
-            (not morning and (dt.now() + td(days=1)).date() != get_planning_day(formatted=False)):
-        log('send_notification was aborted', send_admin=True)
+    planning_day = get_planning_day(formatted=False).strftime("%d.%m")
+    if planning_day in HOLIDAYS:
+        log(f'send_notification was aborted because {planning_day} in holidays', send_admin=True)
         return
 
     for student in students:
         if students[student][LUNCH] is None:  # Если ничего не указано, пишем, иначе - не тревожим
             try:
-                ask_lunch(make_empty_message(student))
+                ask_lunch(create_message(student))
 
             except Exception as error:
                 if 'bot was blocked by the user' in str(error):  # Ситуация плохая, надеемся, такого не случится
@@ -552,11 +577,21 @@ def send_report(classes=LETTERS):
         data = [0] * 4  # Количество людей [Нет данных, Будет обедать, Будет в школе, Не будет в школе]
 
         for student in cur_class:
+            if students[student][LUNCH] is None:
+                try:
+                    bot.get_chat_member_count(student)
+                except telebot.apihelper.ApiTelegramException:
+                    students[student][LUNCH] = students[student][VISIT] = False
+                    students[student][REASON] = 'Ученик до сих пор не зарегистрирован в боте.'
+
             if students[student][LUNCH] is None:  # Нет данных
                 data[0] += 1
                 no_data += f'{data[0]}. {students[student][NAME]}\n'
-                send_message(students[student], f'Извините, но вы не успели ответить. Вы не будете кушать '
-                                                f'{get_planning_day(need_date=False, need_weekday=True)}')
+
+                if clear:
+                    # Оповещаем ученика о том, что он голодает
+                    send_message(students[student], f'Извините, но вы не успели ответить. Вы не будете кушать '
+                                                    f'{get_planning_day(need_date=False, need_weekday=True)}')
 
             elif students[student][LUNCH]:  # Будет обедать
                 data[1] += 1
@@ -602,7 +637,7 @@ def send_report(classes=LETTERS):
                 send_message(admin, text)
 
             if clear:
-                statistic[CLASSES].append((let, get_date(), dt.now().weekday() + 1) + tuple(data))
+                statistic[CLASSES].append([let, get_date(), get_now().weekday() + 1] + data)
                 dump(format_json(statistic), STATISTIC)
         except telebot.apihelper.ApiException:
             log(f'Классный советник класса {let} не зарегистрирован!', send_admin=True)
@@ -620,7 +655,7 @@ def send_notification_about_permanently():
             try:
                 send_message(student, 'Ты уверен, что всю следующую неделю будешь следовать режиму?',
                              reply_markup=make_bool_keyboard())
-                bot.register_next_step_handler(make_empty_message(student), make_permanently)
+                bot.register_next_step_handler(create_message(student), make_permanently)
 
             except Exception as error:
                 if 'bot was blocked by the user' in str(error):  # Ситуация плохая, надеемся, такого не случится
@@ -635,36 +670,41 @@ def run_schedule():
     """Функция, настраивающая библиотеку schedule, напоминания и отчёты"""
     # Не ругаися насяника
     schedule.every().day.at(MORNING_TIME).do(send_message, ADMINS[0], 'Доброе утро, господин, удачного дня')
+    schedule.every().day.at('11:15').do(send_message, 1946021974, 'Доброе утро, бусинка💕✨')
+    schedule.every().day.at('03:00').do(send_message, 1946021974, 'Спокойной ночи, бусинка💕✨')
 
     # Понедельник
-    schedule.every().monday.at(MORNING_TIME).do(send_notification, morning=True)
+    schedule.every().monday.at(MORNING_TIME).do(send_notification)
     schedule.every().monday.at(REPORT_TIME).do(send_report)
     schedule.every().monday.at(EVENING_TIME).do(send_notification)
 
     # Вторник
-    schedule.every().tuesday.at(MORNING_TIME).do(send_notification, morning=True)
+    schedule.every().tuesday.at(MORNING_TIME).do(send_notification)
     schedule.every().tuesday.at(REPORT_TIME).do(send_report)
     schedule.every().tuesday.at(EVENING_TIME).do(send_notification)
 
     # Среда
-    schedule.every().wednesday.at(MORNING_TIME).do(send_notification, morning=True)
+    schedule.every().wednesday.at(MORNING_TIME).do(send_notification)
     schedule.every().wednesday.at(REPORT_TIME).do(send_report)
     schedule.every().wednesday.at(EVENING_TIME).do(send_notification)
 
     # Четверг
-    schedule.every().thursday.at(MORNING_TIME).do(send_notification, morning=True)
+    schedule.every().thursday.at(MORNING_TIME).do(send_notification)
     schedule.every().thursday.at(REPORT_TIME).do(send_report)
     schedule.every().thursday.at(EVENING_TIME).do(send_notification)
 
     # Пятница
-    schedule.every().friday.at(MORNING_TIME).do(send_notification, morning=True)
+    schedule.every().friday.at(MORNING_TIME).do(send_notification)
     schedule.every().friday.at(REPORT_TIME).do(send_report)
     schedule.every().friday.at(EVENING_TIME).do(send_notification)
 
-    # Суббота
-    schedule.every().saturday.at(MORNING_TIME).do(send_notification, morning=True)
-    schedule.every().saturday.at(REPORT_TIME).do(send_report)
-    schedule.every().saturday.at(EVENING_TIME).do(send_notification)
+    # TODO: НЕ ЗАБЫТЬ ПОМЕНЯТЬ!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    for time in FRIDAY_TIMES:
+        schedule.every().wednesday.at(time).do(send_notification)
+    schedule.every().wednesday.at(FRIDAY_REPORT_TIME).do(send_report)
+
+    # Воскресенье
+    schedule.every().sunday.at(EVENING_TIME).do(send_notification)
 
     # Функция permanently
     schedule.every().sunday.at(EVENING_TIME).do(send_notification_about_permanently)
