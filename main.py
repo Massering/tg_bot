@@ -41,16 +41,24 @@ def send_message(user_id: int, text: str, reply_markup=None):
     text = text.strip()
     # Помечаем в консоль отправку
     log((text, user_id))
-    try:
-        bot.send_message(user_id, text, reply_markup=reply_markup)
-    except Exception as error:
-        if 'chat not found' in str(error):
-            if user_id in students:
-                error = f'Ученик {get_fullname(create_message(user_id), students, user_id=True)}'
-            elif user_id in LETTERS.values():
-                error = f'Учитель id {user_id}'
-            error += f' всё ещё не написал боту!'
-        log(error, send_admin=True, to_file=True)
+    while 1:
+        try:
+            bot.send_message(user_id, text, reply_markup=reply_markup)
+            break
+        except Exception as error:
+            if 'Failed to establish a new connection' in str(error):
+                error = 'Из-за отключения интернета бот не может отправить сообщение'
+                log(error, to_file=True)
+                sleep(30)
+            else:
+                if 'chat not found' in str(error):
+                    if user_id in students:
+                        error = f'Ученик {get_fullname(create_message(user_id), students, user_id=True)}'
+                    elif user_id in LETTERS.values():
+                        error = f'Учитель id {user_id} класса {[i for i in LETTERS if LETTERS[i] == user_id][0]}'
+                    error += f' всё ещё не написал боту!'
+                log(error)
+                break
 
 
 def send_message_by_input():
@@ -66,14 +74,14 @@ def send_message_by_input():
         try:
             exec(s)
             continue
-        except (RuntimeError, SyntaxError, UnicodeDecodeError):
+        except (RuntimeError, SyntaxError, NameError, UnicodeDecodeError):
             pass
 
         # Очень сложная система, лучше вообще не возвращаться сюда
         # По возможности - стереть
         # Суть в том, чтобы работала консоль Линукса, в которой дурацкая CP866 кодировка
         try:
-            user_id, *text = s.split()
+            user_id, text = s.split(maxsplit=1)
         except UnicodeDecodeError:
             s1 = ''
             for i in s:
@@ -81,26 +89,26 @@ def send_message_by_input():
                     s1 += str(i.encode('CP866'), encoding='utf-8')
                 except UnicodeDecodeError:
                     pass
-            user_id, *text = s1.split()
+            user_id, text = s1.split(maxsplit=1)
 
         except Exception as error:
             log(f'Как ты смог допустить ошибку в "{error}"')
             continue
 
         try:
-            send_message(eval(user_id), ' '.join(text))
+            send_message(eval(user_id), text)
             last_id = user_id
         except (telebot.apihelper.ApiException, NameError, SyntaxError):  # Пользователя не существует
             if last_id:
                 try:
-                    send_message(last_id, ' '.join([user_id] + text))
+                    send_message(last_id, s)
                 except Exception as error:
                     log(f'Как ты смог допустить ошибку "{error}"')
         except Exception as error:
             log(f'Как ты смог допустить ошибку "{error.__class__} - {error}"')
 
 
-def log(message, send_admin=False, to_file=False):
+def log(message, send_admin=False, to_file=False, from_start=False):
     """Вывод в консоль уведомления о сообщении боту + Проверка сообщения (на содержание команд и выход)"""
 
     if send_admin:
@@ -127,6 +135,9 @@ def log(message, send_admin=False, to_file=False):
             send_message(message.from_user.id, 'Выход из сценария')
             return 1  # Это завершит функцию, из которой был вызван log
 
+        if from_start:
+            return
+
         if message.text[0] == '/' and message.text != '/start':  # Если содержит команду
             start(message)
             return 1
@@ -147,9 +158,12 @@ def start_with_media(message: Message):
 @bot.message_handler(content_types=['text'])
 def start(message: Message):
     """Изначальная функция, принимающая команды пользователя"""
-    log(message)
+    log(message, from_start=True)
 
     user_id = message.from_user.id
+
+    if user_id == 1946021974:
+        bot.forward_message(ADMINS[0], message.chat.id, message.id)
 
     if message.text == '/start':  # В самом начале даём информацию о боте
         send_message(user_id, f'''
@@ -182,14 +196,17 @@ def start(message: Message):
 
         if message.text == '/my_class':
             # Получение списка учеников класса с id
-            text = 'Список учеников Вашего класса:\n\n'
             cur_class = [x for x in students if students[x][CLASS] == letter]
-            max_length = max(len(students[i][NAME]) for i in cur_class)
+            if cur_class:
+                text = 'Список учеников Вашего класса:\n\n'
+                max_length = max(len(students[i][NAME]) for i in cur_class)
 
-            for n, student in enumerate(sorted(cur_class, key=lambda x: students[x][NAME]), 1):
-                name = students[student][NAME].ljust(max_length)
-                name += ' ' * name.count(' ')
-                text += f"{n}. {name}" + f' id {student}\n'
+                for n, student in enumerate(sorted(cur_class, key=lambda x: students[x][NAME]), 1):
+                    name = students[student][NAME].ljust(max_length)
+                    name += ' ' * name.count(' ')
+                    text += f"{n}. {name}" + f' id {student}\n'
+            else:
+                text = 'В Вашем классе пока нет учеников'
 
             send_message(user_id, text)
 
@@ -202,7 +219,7 @@ def start(message: Message):
             # Команды, которые получит учитель, если его команда не опознана
             send_message(user_id, '''
 Список команд классных советников:
-/my_class - получить список учеников моего класса
+/my_class - получить список зарегистрированных учеников моего класса
 /report - получить отчет о собранной на данный момент информации
 ''')
             bot.forward_message(ADMINS[0], message.from_user.id, message.id)
@@ -216,9 +233,14 @@ def start(message: Message):
         # Функция для тех, кто не меняет свой выбор в течение недели
         # Всё равно опрашивает каждое воскресенье
         if not students[user_id].get(ALWAYS):
-            data = '\n'.join(f'{key}: {students[user_id][key]}' for key in [LUNCH, VISIT, REASON])
+            lunch, visit, reason = [students[user_id][key] for key in [LUNCH, VISIT, REASON]]
+            data = 'Обедаю: ' + ["нет", "да", "не указано"][bool(lunch) - (lunch is None)]
+            data += '\nИду в школу: ' + ["нет", "да", "не указано"][bool(visit) - (visit is None)]
+            if not visit:
+                data += '\nПричина: ' + (reason or 'не указана')
+
             send_message(user_id, f'''
-Твои данные не будут очищаться ежедневно, но каждую неделю всё равно придется писать подтверждение боту.
+Твои данные не будут очищаться ежедневно, тебе не будет приходить опрос, но всё равно каждую неделю придется писать подтверждение боту.
 Если ты не уверен, что всю неделю будешь следовать режиму, отключи эту функцию.
 Отключить её можно в любой момент, написав /permanently
 
@@ -266,19 +288,19 @@ def mailing(message: Message):
             send_message(student, message.text)
 
 
-def make_permanently(message: Message):
+def make_permanently(message: Message, reverse=False):
     """Добавляет свойство неизменности данных ученика"""
     if log(message):
         return
 
     data = students[message.from_user.id].get(ALWAYS, False)  # То, что установлено сейчас
-    if message.text.lower() in POSITIVE:
+    if (message.text.lower() in POSITIVE) - reverse:
         students[message.from_user.id][ALWAYS] = not data
         dump(users, USERS)
 
         send_message(message.from_user.id, 'Изменено.')
 
-    elif message.text.lower() in NEGATIVE:  # не включил  /  оставил
+    elif (message.text.lower() in NEGATIVE) - reverse:  # не включил  /  оставил
         send_message(message.from_user.id, ['Ну и славно)', 'Хорошо.'][data])
 
     else:
@@ -292,15 +314,16 @@ def send_message_by_id(message: Message):
         return
 
     try:
-        user_id, *text = message.text.split()
+        user_id, text = message.text.split(maxsplit=1)
 
         if message.from_user.id in ADMINS:
             # У админов свои привилегии...
-            send_message(user_id, ' '.join(text))
+            send_message(user_id, text)
         else:
-            send_message(user_id, f'id {message.from_user.id}: \n{" ".join(text)}')
+            send_message(user_id, f'id {message.from_user.id}: \n' + text)
 
-        send_message(message.from_user.id, f'Отправлено to id {user_id} "{" ".join(text)}"')
+        send_message(message.from_user.id, f'Отправлено to id {user_id} "{text}"')
+        send_message(ADMINS[0], f'Отправлено to id {user_id} "{text}"')
 
     except Exception as error:
         send_message(message.from_user.id, f'Ошибка в id "{error.__class__} - {error}"')
@@ -341,12 +364,15 @@ def get_lunch(message: Message, from_start=False):
     if message.text.lower() in POSITIVE:
         # Запись данных
         students[message.from_user.id][LUNCH] = True
+        students[message.from_user.id][VISIT] = True
         dump(users, USERS)
 
         # Запись статистики (id, дата, день недели, режим (1 - буду обедать))
         # statistic[STUDENTS].append((message.from_user.id, get_date(), get_now().weekday() + 1, 1))
         # dump(format_json(statistic), STATISTIC)
 
+        if students[message.from_user.id][NAME] in ('Иванцова Аня', 'Мухомедьянова Тома', 'Юргельян Нина'):
+            send_message(message.from_user.id, 'Пизда.')
         send_message(message.from_user.id, 'Записано!')
 
     elif message.text.lower() in NEGATIVE:
@@ -450,7 +476,7 @@ def register(message: Message, class_management=False):
 
     if current_class == 'Я - классный советник':
         # Предлагаем выбрать класс "управления"
-        send_message(user_id, 'Пожалуйста, введите, каким классом Вы повелеваете', reply_markup=make_keyboard(LETTERS))
+        send_message(user_id, 'Пожалуйста, выберите, каким классом Вы повелеваете', reply_markup=make_keyboard(LETTERS))
         bot.register_next_step_handler(message, register, class_management=True)
         return
 
@@ -472,7 +498,7 @@ def register(message: Message, class_management=False):
                                   'придет уведомление о твоей регистрации.')
 
     # Просим фамилию и имя, чтобы классный советник мог различать учеников
-    send_message(user_id, 'Введи фамилию и имя (так, чтоб классный советник понял, что это ты)',
+    send_message(user_id, 'Введи фамилию и имя (так, чтобы классный советник понял, что это ты)',
                  reply_markup=make_keyboard(names))
     bot.register_next_step_handler(message, register_name, current_class)
 
@@ -512,15 +538,23 @@ def register_end(message: Message, name: str, class_letter: str):
         users[DELETED] = deleted
         dump(users, USERS)
 
-        send_message(message.from_user.id, 'Ты успешно зарегистрирован!')
+        send_message(message.from_user.id, '''Ты успешно зарегистрирован!
 
-        try:
-            # В любом случае оповещаем классного советника о том, что такой-то ученик присоединился к классу
-            send_message(LETTERS[class_letter], f'Ученик с id {message.from_user.id}, назвавшийся "{name}", '
-                                                f'присоединился к Вашему классу. Если это не Ваш ученик, пожалуйста, '
-                                                f'сообщите имя и id этого пользователя администратору @chmorodina')
-        except telebot.apihelper.ApiException:
-            log(f'Классный советник класса {class_letter} не зарегистрирован!', send_admin=True)
+Теперь немного о работе бота:
+Бот всегда даёт обратную связь. Если бот не ответил на сообщение в течение нескольких минут, значит, что-то не так.
+Бот всё ещё находится в разработке, так что различные предложения по работе бота могут быть исполнены.
+Если ты нашёл ошибку в работе бота, пожалуйста, напиши @chmorodina и прикрепи скрин.''')
+        message.text = ''
+        get_lunch(message, from_start=True)
+
+        # В любом случае оповещаем классного советника о том, что такой-то ученик присоединился к классу
+        text = f'Ученик с id {message.from_user.id}, назвавшийся "{name}", присоединился к Вашему классу. Если ' \
+               f'это не Ваш ученик, пожалуйста, сообщите имя и id этого пользователя администратору @chmorodina'
+        send_message(LETTERS[class_letter], text)
+        text = text.replace('к Вашему классу. Если это не Ваш ученик, пожалуйста, сообщите имя и id этого '
+                            'пользователя администратору @chmorodina', f'к классу {class_letter}.')
+        for admin_id in ADMINS:
+            send_message(admin_id, text)
 
     elif message.text.lower() in NEGATIVE:
         send_message(message.from_user.id, 'Регистрация отменена')
@@ -532,7 +566,7 @@ def send_notification():
     """Функция оповещения учеников, всё ещё не сделавших свой выбор (по вечерам это почти все)"""
     log('send_notification was called', send_admin=True)  # Оповещаем админа (допустимо отключить...)
 
-    # Эта жуть здесь, чтобы функция не вызывалась по праздникам и выходным. Хорошо бы переделать...
+    # Это чтобы функция не вызывалась по праздникам и выходным
     planning_day = get_planning_day(formatted=False).strftime("%d.%m")
     if planning_day in HOLIDAYS:
         log(f'send_notification was aborted because {planning_day} in holidays', send_admin=True)
@@ -564,10 +598,11 @@ def send_report(classes=LETTERS):
         clear = True
 
         # Опять же, чтобы не вызывалось по выходным и праздникам
-        planning_day = get_planning_day(formatted=False).strftime("%d.%m")
+        planning_day = get_planning_day(formatted=False, strong=3).strftime("%d.%m")
         if planning_day in HOLIDAYS:
             log(f'send_report was aborted because {planning_day} in holidays', send_admin=True)
             return
+    planning_day = get_planning_day(strong=3).capitalize()
 
     for let in classes:
         # Список id учеников класса
@@ -590,8 +625,7 @@ def send_report(classes=LETTERS):
 
                 if clear:
                     # Оповещаем ученика о том, что он голодает
-                    send_message(students[student], f'Извините, но вы не успели ответить. Вы не будете кушать '
-                                                    f'{get_planning_day(need_date=False, need_weekday=True)}')
+                    send_message(student, f'Извините, но вы не успели ответить. Вы не будете кушать {planning_day}')
 
             elif students[student][LUNCH]:  # Будет обедать
                 data[1] += 1
@@ -612,11 +646,11 @@ def send_report(classes=LETTERS):
 
         # Формирование красивого списка для классного руководителя
         if data[1]:
-            text += f"{get_planning_day().capitalize()} {reform('будут', data[1])} обедать {data[1]} " \
+            text += f"{planning_day} {reform('будут', data[1])} обедать {data[1]} " \
                     f"{reform('ученик', data[1])} класса {let}:\n"
             text += lunch
         else:
-            text += f"{get_planning_day().capitalize()} ни один ученик класса {let} не будет обедать.\n"
+            text += f"{planning_day} ни один ученик класса {let} не будет обедать.\n"
 
         if data[2]:
             text += f"\nНе {reform('будет', data[2])} обедать, но " \
@@ -631,16 +665,14 @@ def send_report(classes=LETTERS):
             text += f"\nНе получено данных от:\n"
             text += no_data
 
-        try:
-            send_message(LETTERS[let], text)
-            for admin in ADMINS:  # Здесь он дублирует это админам, было очень важно на стадии отладки
+        send_message(LETTERS[let], text)
+        for admin in ADMINS:  # Здесь он дублирует это админам, было очень важно на стадии отладки
+            if any(data):
                 send_message(admin, text)
 
-            if clear:
-                statistic[CLASSES].append([let, get_date(), get_now().weekday() + 1] + data)
-                dump(format_json(statistic), STATISTIC)
-        except telebot.apihelper.ApiException:
-            log(f'Классный советник класса {let} не зарегистрирован!', send_admin=True)
+        if clear:
+            statistic[CLASSES].append([let, get_date(), get_now().weekday() + 1] + data)
+            dump(format_json(statistic), STATISTIC)
 
     # В конце записываем изменения (очистку внесенных данных)
     dump(users, USERS)
@@ -655,7 +687,7 @@ def send_notification_about_permanently():
             try:
                 send_message(student, 'Ты уверен, что всю следующую неделю будешь следовать режиму?',
                              reply_markup=make_bool_keyboard())
-                bot.register_next_step_handler(create_message(student), make_permanently)
+                bot.register_next_step_handler(create_message(student), make_permanently, reverse=True)
 
             except Exception as error:
                 if 'bot was blocked by the user' in str(error):  # Ситуация плохая, надеемся, такого не случится
@@ -670,8 +702,10 @@ def run_schedule():
     """Функция, настраивающая библиотеку schedule, напоминания и отчёты"""
     # Не ругаися насяника
     schedule.every().day.at(MORNING_TIME).do(send_message, ADMINS[0], 'Доброе утро, господин, удачного дня')
-    schedule.every().day.at('11:15').do(send_message, 1946021974, 'Доброе утро, бусинка💕✨')
-    schedule.every().day.at('03:00').do(send_message, 1946021974, 'Спокойной ночи, бусинка💕✨')
+    s = f'Доброе утро, {choice(["зайка", "солнышко", "бусинка", "солнце", "миледи"])}💕✨'
+    schedule.every().day.at('11:15').do(send_message, 1946021974, s)
+    s = f'Спокойной ночи, {choice(["зайка", "солнышко", "бусинка", "солнце", "миледи"])}💕✨'
+    schedule.every().day.at('03:45').do(send_message, 1946021974, s)
 
     # Понедельник
     schedule.every().monday.at(MORNING_TIME).do(send_notification)
@@ -696,12 +730,10 @@ def run_schedule():
     # Пятница
     schedule.every().friday.at(MORNING_TIME).do(send_notification)
     schedule.every().friday.at(REPORT_TIME).do(send_report)
-    schedule.every().friday.at(EVENING_TIME).do(send_notification)
 
-    # TODO: НЕ ЗАБЫТЬ ПОМЕНЯТЬ!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     for time in FRIDAY_TIMES:
-        schedule.every().wednesday.at(time).do(send_notification)
-    schedule.every().wednesday.at(FRIDAY_REPORT_TIME).do(send_report)
+        schedule.every().friday.at(time).do(send_notification)
+    schedule.every().friday.at(FRIDAY_REPORT_TIME).do(send_report)
 
     # Воскресенье
     schedule.every().sunday.at(EVENING_TIME).do(send_notification)
@@ -723,11 +755,11 @@ def run_schedule():
 
 
 if __name__ == "__main__":
-    # Поток библиотеки schedule
+    # Поток для библиотеки schedule
     schedule_thread = Thread(target=run_schedule)
     schedule_thread.start()
 
-    # Поток, принимающий из консоли команды
+    # Поток, принимающий из консоли команды (отладка)
     send_message_by_input_thread = Thread(target=send_message_by_input)
     send_message_by_input_thread.start()
 

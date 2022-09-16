@@ -1,134 +1,235 @@
 {
   "students": {
-    "1868213058": {
-      "class": "ι",
-      "name": "Абакановский Влад",
-      "lunch": null,
-      "school_visit": null
+    "5143344248": {
+      "class": "γ (Гамма)",
+      "name": "Gorobetz Yura",
+      "lunch": true,
+      "school_visit": null,
+      "reason": null
     },
-    "1430032907": {
-      "class": "ι",
-      "name": "Барон Владислав",
+    "1089219862": {
+      "class": "ε (Эпсилон)",
+      "name": "Ivanov Ivan",
+      "lunch": false,
+      "school_visit": true,
+      "reason": null
+    },
+    "1092602215": {
+      "class": "ε (Эпсилон)",
+      "name": "Vlad Sem",
+      "lunch": false,
+      "school_visit": true,
+      "reason": null
+    },
+    "1868213058": {
+      "class": "ι (Йота)",
+      "name": "Абакановский Влад",
       "lunch": true,
       "school_visit": null
     },
     "858573431": {
-      "class": "ι",
+      "class": "ι (Йота)",
       "name": "Басков Никита",
       "lunch": true,
       "school_visit": null,
       "reason": null
     },
+    "5105695036": {
+      "class": "ε (Эпсилон)",
+      "name": "Бордзикули",
+      "lunch": true,
+      "school_visit": true,
+      "reason": null
+    },
+    "816765827": {
+      "class": "ε (Эпсилон)",
+      "name": "Борисевич Роман",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
     "1165447922": {
-      "class": "ι",
+      "class": "ι (Йота)",
       "name": "Бухтоярова Анастасия",
       "lunch": true,
       "school_visit": null
     },
     "1165152297": {
-      "class": "ι",
+      "class": "ι (Йота)",
       "name": "Зарипов Ылья",
-      "lunch": true,
+      "lunch": null,
       "school_visit": null,
       "reason": null
     },
     "1344741369": {
-      "class": "ι",
+      "class": "ι (Йота)",
       "name": "Иванцова Аня",
       "lunch": null,
       "school_visit": null
     },
+    "1658331986": {
+      "class": "γ (Гамма)",
+      "name": "Иванченко Леонид",
+      "lunch": true,
+      "school_visit": null,
+      "reason": null
+    },
     "700026795": {
-      "class": "ι",
+      "class": "ι (Йота)",
       "name": "Кеммерер Сергей",
       "lunch": true,
       "school_visit": null
     },
     "400435224": {
-      "class": "ι",
+      "class": "ι (Йота)",
       "name": "Кишкин Алексей",
       "lunch": true,
       "school_visit": null
     },
+    "781105238": {
+      "class": "γ (Гамма)",
+      "name": "Климова Мария",
+      "lunch": true,
+      "school_visit": null,
+      "reason": null
+    },
+    "783782556": {
+      "class": "γ (Гамма)",
+      "name": "Марков Семён",
+      "lunch": true,
+      "school_visit": null,
+      "reason": null
+    },
     "1061139622": {
-      "class": "ι",
+      "class": "ι (Йота)",
       "name": "Марьясов Владимир",
       "lunch": null,
       "school_visit": null,
       "reason": "уехал в лагерь"
     },
     "1883271571": {
-      "class": "ι",
+      "class": "ι (Йота)",
       "name": "Муковозчик Артём",
       "lunch": null,
       "school_visit": null
     },
     "519905246": {
-      "class": "ι",
+      "class": "ι (Йота)",
       "name": "Мухомедьянова Тома",
       "lunch": null,
       "school_visit": null,
       "reason": "Уезжаю на конференцию"
     },
     "603377678": {
-      "class": "ι",
+      "class": "ι (Йота)",
       "name": "Попов Вадим",
       "lunch": null,
       "school_visit": null,
-      "reason": "Приболел, кашель сопли, думаю ко вторнику уже долечусь"
+      "reason": "Ученик до сих пор не зарегистрирован в боте."
     },
     "1069934389": {
-      "class": "ι",
+      "class": "ι (Йота)",
       "name": "Постоева Анастасия",
-      "lunch": false,
-      "school_visit": false
-    },
-    "2078652234": {
-      "class": "ι",
-      "name": "Ровняго Дмитрий",
       "lunch": true,
-      "school_visit": null,
-      "reason": "Болею"
+      "school_visit": null
     },
-    "1089524173": {
-      "class": "ι",
-      "name": "Рудаков Максим",
+    "1282748443": {
+      "class": "γ (Гамма)",
+      "name": "Резин Игорь",
       "lunch": null,
       "school_visit": null,
       "reason": null
     },
+    "2078652234": {
+      "class": "ι (Йота)",
+      "name": "Ровняго Дмитрий",
+      "lunch": null,
+      "school_visit": null,
+      "reason": "Болею"
+    },
+    "1089524173": {
+      "class": "ι (Йота)",
+      "name": "Рудаков Максим",
+      "lunch": true,
+      "school_visit": null,
+      "reason": null,
+      "permanently": false
+    },
+    "660379735": {
+      "class": "γ (Гамма)",
+      "name": "Ситникова Даша",
+      "lunch": true,
+      "school_visit": null,
+      "reason": null
+    },
+    "1822590281": {
+      "class": "ι (Йота)",
+      "name": "Скурковин Егор",
+      "lunch": true,
+      "school_visit": null,
+      "reason": null
+    },
     "979923466": {
-      "class": "ι",
+      "class": "ι (Йота)",
       "name": "Совкова София",
       "lunch": true,
       "school_visit": null,
-      "reason": "буду на 13 элементе"
+      "reason": "буду на 13 элементе",
+      "permanently": true
     },
     "408045956": {
-      "class": "ι",
+      "class": "ι (Йота)",
       "name": "Соловьев Игорь",
       "lunch": null,
       "school_visit": null,
       "reason": "Болезнь"
     },
+    "732224943": {
+      "class": "χ (Хи)",
+      "name": "Татьяна Таскина",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1325131872": {
+      "class": "ε (Эпсилон)",
+      "name": "Ходюкова Ольга",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
     "1831580928": {
-      "class": "ι",
+      "class": "ι (Йота)",
       "name": "Шкредов Сергей",
       "lunch": true,
       "school_visit": null
     },
-    "1998062038": {
-      "class": "ι",
-      "name": "Юргельян Нина",
+    "1098725944": {
+      "class": "ε (Эпсилон)",
+      "name": "Шмаков Валерий",
       "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1998062038": {
+      "class": "ι (Йота)",
+      "name": "Юргельян Нина",
+      "lunch": true,
       "school_visit": null
     },
     "1987908012": {
-      "class": "ι",
+      "class": "ι (Йота)",
       "name": "Яковлев Демьян",
       "lunch": null,
       "school_visit": null
     }
   },
-  "deleted": {}
+  "deleted": {
+    "1430032907": {
+      "class": "ι (Йота)",
+      "name": "Барон Владислав",
+      "lunch": null,
+      "school_visit": null
+    }
+  }
 }

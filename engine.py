@@ -1,6 +1,6 @@
 from telebot.types import *
 # Нереализованная идея с вариантами вопросов
-# from random import choice
+from random import choice
 from datetime import datetime as dt, timedelta as td, date
 import pymorphy2
 
@@ -12,7 +12,7 @@ morph = pymorphy2.MorphAnalyzer()
 
 def get_now() -> dt:
     """Получение даты и времени сейчас. Используется везде вместо dt.now() чтобы имитировать другой день"""
-    return dt.now() + td(days=0)
+    return dt.now()
 
 
 def get_date() -> str:
