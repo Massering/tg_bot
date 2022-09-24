@@ -3,42 +3,138 @@
     "5143344248": {
       "class": "γ (Гамма)",
       "name": "Gorobetz Yura",
-      "lunch": true,
+      "lunch": null,
       "school_visit": null,
       "reason": null
     },
     "1089219862": {
       "class": "ε (Эпсилон)",
       "name": "Ivanov Ivan",
-      "lunch": false,
-      "school_visit": true,
+      "lunch": null,
+      "school_visit": null,
       "reason": null
+    },
+    "1024648481": {
+      "class": "η (Эта)",
+      "name": "Tim",
+      "lunch": true,
+      "school_visit": true,
+      "reason": null,
+      "permanently": true
     },
     "1092602215": {
       "class": "ε (Эпсилон)",
       "name": "Vlad Sem",
-      "lunch": false,
-      "school_visit": true,
+      "lunch": null,
+      "school_visit": null,
       "reason": null
     },
     "1868213058": {
       "class": "ι (Йота)",
       "name": "Абакановский Влад",
-      "lunch": true,
+      "lunch": null,
       "school_visit": null
+    },
+    "1909915777": {
+      "class": "χ (Хи)",
+      "name": "Аболевич Данил",
+      "lunch": false,
+      "school_visit": true,
+      "reason": null,
+      "permanently": true
+    },
+    "890446591": {
+      "class": "γ (Гамма)",
+      "name": "Авдеев Максим",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1381644188": {
+      "class": "γ (Гамма)",
+      "name": "Ангелина Акимова",
+      "lunch": false,
+      "school_visit": false,
+      "reason": "Больное горло(последствия прививки от гриппа)"
+    },
+    "454676294": {
+      "class": "δ (Дельта)",
+      "name": "Александров Кирилл",
+      "lunch": true,
+      "school_visit": true,
+      "reason": null,
+      "permanently": true
+    },
+    "5167914878": {
+      "class": "χ (Хи)",
+      "name": "Александров Лев",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1356872427": {
+      "class": "ζ (Дзета)",
+      "name": "Арина",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "847568068": {
+      "class": "δ (Дельта)",
+      "name": "Атамасов Клим",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "881927381": {
+      "class": "δ (Дельта)",
+      "name": "Бабушкин Владимир",
+      "lunch": true,
+      "school_visit": true,
+      "reason": null,
+      "permanently": true
+    },
+    "1995978895": {
+      "class": "δ (Дельта)",
+      "name": "Баранцов Глеб",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
     },
     "858573431": {
       "class": "ι (Йота)",
       "name": "Басков Никита",
       "lunch": true,
+      "school_visit": true,
+      "reason": null,
+      "permanently": true
+    },
+    "679548535": {
+      "class": "η (Эта)",
+      "name": "Баталов Илья",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "5113801796": {
+      "class": "χ (Хи)",
+      "name": "Башкиров Михаил",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1759835600": {
+      "class": "χ (Хи)",
+      "name": "Бондарев Антон",
+      "lunch": null,
       "school_visit": null,
       "reason": null
     },
     "5105695036": {
       "class": "ε (Эпсилон)",
       "name": "Бордзикули",
-      "lunch": true,
-      "school_visit": true,
+      "lunch": null,
+      "school_visit": null,
       "reason": null
     },
     "816765827": {
@@ -48,11 +144,123 @@
       "school_visit": null,
       "reason": null
     },
+    "583054176": {
+      "class": "φ (Фи)",
+      "name": "Борисова Диана",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1181901613": {
+      "class": "η (Эта)",
+      "name": "Бравая Елизавета",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "2132709787": {
+      "class": "γ (Гамма)",
+      "name": "Буданов Кирилл",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1397625315": {
+      "class": "φ (Фи)",
+      "name": "Булдаков Арсений",
+      "lunch": null,
+      "school_visit": null,
+      "reason": "питер"
+    },
     "1165447922": {
       "class": "ι (Йота)",
       "name": "Бухтоярова Анастасия",
-      "lunch": true,
+      "lunch": null,
       "school_visit": null
+    },
+    "863932360": {
+      "class": "δ (Дельта)",
+      "name": "Верещагин Максим",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1263832945": {
+      "class": "η (Эта)",
+      "name": "Вероника Потыкайлова",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1397077808": {
+      "class": "η (Эта)",
+      "name": "Верхотуров Светозар",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "908522149": {
+      "class": "φ (Фи)",
+      "name": "Галанов Иван",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1618464557": {
+      "class": "η (Эта)",
+      "name": "Горбань Дмитрий",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "890285619": {
+      "class": "ε (Эпсилон)",
+      "name": "Губанова Анастасия",
+      "lunch": null,
+      "school_visit": null,
+      "reason": "Соревнования"
+    },
+    "1069544939": {
+      "class": "δ (Дельта)",
+      "name": "Дарья",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1887611335": {
+      "class": "δ (Дельта)",
+      "name": "Дегтярев Виктор",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "2092040234": {
+      "class": "χ (Хи)",
+      "name": "Деев Кирилл",
+      "lunch": true,
+      "school_visit": true,
+      "reason": null
+    },
+    "991597923": {
+      "class": "δ (Дельта)",
+      "name": "Дьяков Кирилл",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1032354854": {
+      "class": "δ (Дельта)",
+      "name": "Ефимкин Александр",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "700207524": {
+      "class": "ζ (Дзета)",
+      "name": "Закарлюка Иван",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
     },
     "1165152297": {
       "class": "ι (Йота)",
@@ -61,29 +269,94 @@
       "school_visit": null,
       "reason": null
     },
+    "1683394735": {
+      "class": "η (Эта)",
+      "name": "Зинатулин Максим",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
     "1344741369": {
       "class": "ι (Йота)",
       "name": "Иванцова Аня",
+      "lunch": true,
+      "school_visit": true,
+      "reason": "Приятного аппетита",
+      "permanently": true
+    },
+    "1047138873": {
+      "class": "ζ (Дзета)",
+      "name": "Иванцова Полина",
       "lunch": null,
-      "school_visit": null
+      "school_visit": null,
+      "reason": null
     },
     "1658331986": {
       "class": "γ (Гамма)",
       "name": "Иванченко Леонид",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1740176096": {
+      "class": "χ (Хи)",
+      "name": "Иконникова Дарья",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1699471899": {
+      "class": "φ (Фи)",
+      "name": "Исаченко Матвей",
       "lunch": true,
+      "school_visit": true,
+      "reason": null
+    },
+    "1891091253": {
+      "class": "η (Эта)",
+      "name": "Казакова Влада",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "5289232851": {
+      "class": "χ (Хи)",
+      "name": "Катышева Алена",
+      "lunch": null,
       "school_visit": null,
       "reason": null
     },
     "700026795": {
       "class": "ι (Йота)",
       "name": "Кеммерер Сергей",
-      "lunch": true,
+      "lunch": null,
       "school_visit": null
+    },
+    "1983430649": {
+      "class": "γ (Гамма)",
+      "name": "Ким Арсений",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1245500653": {
+      "class": "φ (Фи)",
+      "name": "Киреев Никита",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1597501215": {
+      "class": "ζ (Дзета)",
+      "name": "Кириленко Захар",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
     },
     "400435224": {
       "class": "ι (Йота)",
       "name": "Кишкин Алексей",
-      "lunch": true,
+      "lunch": null,
       "school_visit": null
     },
     "781105238": {
@@ -91,21 +364,142 @@
       "name": "Климова Мария",
       "lunch": true,
       "school_visit": null,
+      "reason": null,
+      "permanently": true
+    },
+    "1997463532": {
+      "class": "η (Эта)",
+      "name": "Кожура Илья",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1503984259": {
+      "class": "η (Эта)",
+      "name": "Колпаков Иван",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "957803913": {
+      "class": "χ (Хи)",
+      "name": "Копылов Эрик",
+      "lunch": null,
+      "school_visit": null,
+      "reason": "Болею."
+    },
+    "402959872": {
+      "class": "δ (Дельта)",
+      "name": "Король",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "575700583": {
+      "class": "ε (Эпсилон)",
+      "name": "Кривоносов Денис",
+      "lunch": true,
+      "school_visit": true,
+      "reason": null,
+      "permanently": true
+    },
+    "1152259753": {
+      "class": "φ (Фи)",
+      "name": "Левченко Маргарита",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1258090705": {
+      "class": "ζ (Дзета)",
+      "name": "Локотецких Валерия",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1259402746": {
+      "class": "χ (Хи)",
+      "name": "Лужников Сергей",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "994326271": {
+      "class": "χ (Хи)",
+      "name": "Лушникова Екатерина",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1004343580": {
+      "class": "φ (Фи)",
+      "name": "Максим Фадин",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1851426470": {
+      "class": "δ (Дельта)",
+      "name": "Малиновский Александр",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null,
+      "permanently": false
+    },
+    "1433744803": {
+      "class": "η (Эта)",
+      "name": "Маргарита Шмидт",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1019627968": {
+      "class": "γ (Гамма)",
+      "name": "Марина Шин",
+      "lunch": null,
+      "school_visit": null,
       "reason": null
     },
     "783782556": {
       "class": "γ (Гамма)",
       "name": "Марков Семён",
-      "lunch": true,
+      "lunch": null,
       "school_visit": null,
       "reason": null
     },
     "1061139622": {
       "class": "ι (Йота)",
       "name": "Марьясов Владимир",
+      "lunch": true,
+      "school_visit": true
+    },
+    "906734466": {
+      "class": "χ (Хи)",
+      "name": "Маслюков Георгий",
       "lunch": null,
       "school_visit": null,
-      "reason": "уехал в лагерь"
+      "reason": null
+    },
+    "862648085": {
+      "class": "χ (Хи)",
+      "name": "Мельниченко Таисия",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "844186274": {
+      "class": "δ (Дельта)",
+      "name": "Михайлов Глеб",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "783812191": {
+      "class": "ε (Эпсилон)",
+      "name": "Михневич Катя",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
     },
     "1883271571": {
       "class": "ι (Йота)",
@@ -113,12 +507,106 @@
       "lunch": null,
       "school_visit": null
     },
+    "1630530534": {
+      "class": "χ (Хи)",
+      "name": "Мулюкина Анастасия",
+      "lunch": null,
+      "school_visit": null,
+      "reason": "Большая перемена"
+    },
     "519905246": {
       "class": "ι (Йота)",
       "name": "Мухомедьянова Тома",
       "lunch": null,
+      "school_visit": null
+    },
+    "1060193414": {
+      "class": "ε (Эпсилон)",
+      "name": "НЕтесов Иван",
+      "lunch": true,
+      "school_visit": true,
+      "reason": null,
+      "permanently": true
+    },
+    "788729669": {
+      "class": "η (Эта)",
+      "name": "Нестреляева Виктория",
+      "lunch": null,
       "school_visit": null,
-      "reason": "Уезжаю на конференцию"
+      "reason": null
+    },
+    "570255025": {
+      "class": "δ (Дельта)",
+      "name": "Оля Токарева",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "808403694": {
+      "class": "χ (Хи)",
+      "name": "Орлов Игорь",
+      "lunch": true,
+      "school_visit": true,
+      "reason": null,
+      "permanently": true
+    },
+    "485766896": {
+      "class": "φ (Фи)",
+      "name": "Орлова Арина",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1121624532": {
+      "class": "δ (Дельта)",
+      "name": "Пахомова Милена",
+      "lunch": true,
+      "school_visit": true,
+      "reason": null,
+      "permanently": true
+    },
+    "663072383": {
+      "class": "ε (Эпсилон)",
+      "name": "Пиксаев Роман",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1959369889": {
+      "class": "γ (Гамма)",
+      "name": "Пинаева Мария",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1233120388": {
+      "class": "χ (Хи)",
+      "name": "Поддубная Дарья",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1950633799": {
+      "class": "γ (Гамма)",
+      "name": "Поляков Денис",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null,
+      "permanently": false
+    },
+    "1509494385": {
+      "class": "η (Эта)",
+      "name": "Понасенко Александр",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1959172937": {
+      "class": "δ (Дельта)",
+      "name": "Поневежская Варвара",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
     },
     "603377678": {
       "class": "ι (Йота)",
@@ -130,8 +618,22 @@
     "1069934389": {
       "class": "ι (Йота)",
       "name": "Постоева Анастасия",
-      "lunch": true,
+      "lunch": null,
       "school_visit": null
+    },
+    "626023413": {
+      "class": "γ (Гамма)",
+      "name": "Похабов Иван",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1384339993": {
+      "class": "δ (Дельта)",
+      "name": "Редько Сергей",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
     },
     "1282748443": {
       "class": "γ (Гамма)",
@@ -147,27 +649,84 @@
       "school_visit": null,
       "reason": "Болею"
     },
+    "827790445": {
+      "class": "η (Эта)",
+      "name": "Рожков Анатолий",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "809423690": {
+      "class": "η (Эта)",
+      "name": "Романченко Софья",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
     "1089524173": {
       "class": "ι (Йота)",
-      "name": "Рудаков Максим",
+      "name": "Рудаков Максимка",
       "lunch": true,
+      "school_visit": true,
+      "reason": null
+    },
+    "1110786320": {
+      "class": "η (Эта)",
+      "name": "Садовский Виктор",
+      "lunch": null,
       "school_visit": null,
+      "reason": null
+    },
+    "957952960": {
+      "class": "χ (Хи)",
+      "name": "Сахнов Данила",
+      "lunch": true,
+      "school_visit": true,
       "reason": null,
-      "permanently": false
+      "permanently": true
+    },
+    "1069912335": {
+      "class": "γ (Гамма)",
+      "name": "Саян",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
     },
     "660379735": {
       "class": "γ (Гамма)",
       "name": "Ситникова Даша",
-      "lunch": true,
+      "lunch": null,
       "school_visit": null,
       "reason": null
     },
     "1822590281": {
       "class": "ι (Йота)",
       "name": "Скурковин Егор",
-      "lunch": true,
+      "lunch": null,
       "school_visit": null,
       "reason": null
+    },
+    "1641475130": {
+      "class": "η (Эта)",
+      "name": "Слугин Максим",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "5061564644": {
+      "class": "φ (Фи)",
+      "name": "Собачкина Анастасия",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1192660762": {
+      "class": "χ (Хи)",
+      "name": "Соболев Сергей",
+      "lunch": true,
+      "school_visit": true,
+      "reason": null,
+      "permanently": true
     },
     "979923466": {
       "class": "ι (Йота)",
@@ -184,9 +743,37 @@
       "school_visit": null,
       "reason": "Болезнь"
     },
-    "732224943": {
-      "class": "χ (Хи)",
-      "name": "Татьяна Таскина",
+    "1959214466": {
+      "class": "φ (Фи)",
+      "name": "Судиловский Данил",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "5004573631": {
+      "class": "φ (Фи)",
+      "name": "Тимофеев Владимир",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "932558401": {
+      "class": "φ (Фи)",
+      "name": "Усачёв Семён",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "2012437173": {
+      "class": "γ (Гамма)",
+      "name": "Фаилов Кирилл",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1200155803": {
+      "class": "δ (Дельта)",
+      "name": "Халекова Полина",
       "lunch": null,
       "school_visit": null,
       "reason": null
@@ -196,12 +783,62 @@
       "name": "Ходюкова Ольга",
       "lunch": null,
       "school_visit": null,
+      "reason": "Лечение"
+    },
+    "1279274762": {
+      "class": "η (Эта)",
+      "name": "Хорошилов Никита",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1016660159": {
+      "class": "χ (Хи)",
+      "name": "Чаплыгина Екатерина",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1020737893": {
+      "class": "χ (Хи)",
+      "name": "Черепанов Тимур",
+      "lunch": true,
+      "school_visit": true,
+      "reason": null,
+      "permanently": true
+    },
+    "2042361748": {
+      "class": "φ (Фи)",
+      "name": "Чернышев Марк",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "695919278": {
+      "class": "δ (Дельта)",
+      "name": "Шадррн Дима)",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1796430434": {
+      "class": "δ (Дельта)",
+      "name": "Шемелов Антон",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "1734504692": {
+      "class": "ζ (Дзета)",
+      "name": "Шишкина Яна",
+      "lunch": null,
+      "school_visit": null,
       "reason": null
     },
     "1831580928": {
       "class": "ι (Йота)",
       "name": "Шкредов Сергей",
-      "lunch": true,
+      "lunch": null,
       "school_visit": null
     },
     "1098725944": {
@@ -211,17 +848,48 @@
       "school_visit": null,
       "reason": null
     },
+    "5158092755": {
+      "class": "ζ (Дзета)",
+      "name": "Шмурова Анна",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
     "1998062038": {
       "class": "ι (Йота)",
       "name": "Юргельян Нина",
       "lunch": true,
-      "school_visit": null
+      "school_visit": true,
+      "reason": "Плалала",
+      "permanently": true
     },
     "1987908012": {
       "class": "ι (Йота)",
       "name": "Яковлев Демьян",
       "lunch": null,
       "school_visit": null
+    },
+    "873347082": {
+      "class": "ζ (Дзета)",
+      "name": "Ястребов Владислав",
+      "lunch": true,
+      "school_visit": true,
+      "reason": null,
+      "permanently": true
+    },
+    "803931816": {
+      "class": "δ (Дельта)",
+      "name": "виктория павлюкова",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
+    },
+    "885136819": {
+      "class": "η (Эта)",
+      "name": "зиганшина алина",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
     }
   },
   "deleted": {
@@ -230,6 +898,13 @@
       "name": "Барон Владислав",
       "lunch": null,
       "school_visit": null
+    },
+    "792177799": {
+      "class": "φ (Фи)",
+      "name": "Поздняков Никита",
+      "lunch": null,
+      "school_visit": null,
+      "reason": null
     }
   }
 }

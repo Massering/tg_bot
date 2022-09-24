@@ -51,11 +51,17 @@ def send_message(user_id: int, text: str, reply_markup=None):
                 log(error, to_file=True)
                 sleep(30)
             else:
-                if 'chat not found' in str(error):
+                if 'bot was blocked by the user' in str(error):  # Ситуация плохая, надеемся, такого не случится
+                    # del students[user_id]
+                    error = f'Пользователь {get_fullname(user_id, students, True, True)} заблокировал ' \
+                            f'бота и (не) был удален.'
+                elif 'chat not found' in str(error):
                     if user_id in students:
-                        error = f'Ученик {get_fullname(create_message(user_id), students, user_id=True)}'
+                        error = f'Ученик {get_fullname(user_id, students, True, True)}'
                     elif user_id in LETTERS.values():
-                        error = f'Учитель id {user_id} класса {[i for i in LETTERS if LETTERS[i] == user_id][0]}'
+                        error = f'Учитель id {user_id} класса {get_letter(user_id)}'
+                    else:
+                        error = f'Пользователь {get_fullname(user_id, {}, True, True)}'
                     error += f' всё ещё не написал боту!'
                 log(error)
                 break
@@ -74,8 +80,8 @@ def send_message_by_input():
         try:
             exec(s)
             continue
-        except (RuntimeError, SyntaxError, NameError, UnicodeDecodeError):
-            pass
+        except Exception as error:
+            print(error.__cause__)
 
         # Очень сложная система, лучше вообще не возвращаться сюда
         # По возможности - стереть
@@ -127,23 +133,23 @@ def log(message, send_admin=False, to_file=False, from_start=False):
             start_with_media(message)
             return 1
 
-        name = get_fullname(message, students, user_id=True)
+        name = get_fullname(message, students, True, True)
         text = f'{get_date()} - {name}: "{message.text}"'
         print(text)
+
+        if from_start:
+            return
 
         if message.text.lower() == '/exit':
             send_message(message.from_user.id, 'Выход из сценария')
             return 1  # Это завершит функцию, из которой был вызван log
-
-        if from_start:
-            return
 
         if message.text[0] == '/' and message.text != '/start':  # Если содержит команду
             start(message)
             return 1
 
     elif isinstance(message, tuple):
-        print(f'{get_date()} - this Bot to {message[1]}: "{message[0]}"')
+        print(f'{get_date()} - this Bot to {get_fullname(message[1], students)}: "{message[0]}"')
 
     else:
         print(f'{get_date()} - system_log: "{message}"')
@@ -191,17 +197,19 @@ def start(message: Message):
         bot.register_next_step_handler(message, mailing)
 
     elif user_id in LETTERS.values():
-        # Если пользователь классный советник, у него есть свои функции кроме вышеупомянутых
+        # Если пользователь - классный советник, у него есть свои функции кроме вышеупомянутых
         *_, letter = sorted(i[0] for i in LETTERS.items() if i[1] == user_id)
+        cur_class = sorted([i for i in students if students[i][CLASS] == letter], key=lambda x: students[x][NAME])
+        class_list = [students[i][NAME] for i in cur_class]
+        bot.forward_message(ADMINS[0], message.from_user.id, message.id)
 
         if message.text == '/my_class':
             # Получение списка учеников класса с id
-            cur_class = [x for x in students if students[x][CLASS] == letter]
             if cur_class:
                 text = 'Список учеников Вашего класса:\n\n'
                 max_length = max(len(students[i][NAME]) for i in cur_class)
 
-                for n, student in enumerate(sorted(cur_class, key=lambda x: students[x][NAME]), 1):
+                for n, student in enumerate(cur_class, 1):
                     name = students[student][NAME].ljust(max_length)
                     name += ' ' * name.count(' ')
                     text += f"{n}. {name}" + f' id {student}\n'
@@ -214,6 +222,16 @@ def start(message: Message):
             # Отчёт вне расписания (посмотреть, кто уже отметился, а кто нет)
             send_report(classes=[letter])
 
+        elif message.text == '/rename':
+            send_message(user_id, 'Выберите из списка имя того, кого хотите переименовать',
+                         reply_markup=class_list)
+            bot.register_next_step_handler(message, rename, cur_class)
+
+        elif message.text == '/del_student':
+            send_message(user_id, 'Выберите из списка имя того, кого хотите удалить',
+                         reply_markup=class_list)
+            bot.register_next_step_handler(message, del_user, cur_class)
+
         else:
             # Иначе даем список команд
             # Команды, которые получит учитель, если его команда не опознана
@@ -221,8 +239,9 @@ def start(message: Message):
 Список команд классных советников:
 /my_class - получить список зарегистрированных учеников моего класса
 /report - получить отчет о собранной на данный момент информации
+/mailing - отправить всем ученикам Вашего класса сообщение, которое вы введёте
+/del_student - удалить ученика из списка Вашего класса
 ''')
-            bot.forward_message(ADMINS[0], message.from_user.id, message.id)
 
     elif user_id not in students:  # Если ученик не зарегистрирован, предлагаем сделать это
         send_message(user_id, 'Хочешь зарегистрироваться?',
@@ -233,7 +252,7 @@ def start(message: Message):
         # Функция для тех, кто не меняет свой выбор в течение недели
         # Всё равно опрашивает каждое воскресенье
         if not students[user_id].get(ALWAYS):
-            lunch, visit, reason = [students[user_id][key] for key in [LUNCH, VISIT, REASON]]
+            lunch, visit, reason = [students[user_id].get(key, None) for key in [LUNCH, VISIT, REASON]]
             data = 'Обедаю: ' + ["нет", "да", "не указано"][bool(lunch) - (lunch is None)]
             data += '\nИду в школу: ' + ["нет", "да", "не указано"][bool(visit) - (visit is None)]
             if not visit:
@@ -253,6 +272,10 @@ def start(message: Message):
         else:
             send_message(user_id, 'Отключить функцию?', reply_markup=make_bool_keyboard())
             bot.register_next_step_handler(message, make_permanently)
+
+    elif message.text == '/rename':
+        send_message(user_id, 'Введи новое имя')
+        bot.register_next_step_handler(message, rename)
 
     elif message.text == '/del_myself':
         # Удаление ученика из системы
@@ -278,7 +301,7 @@ def mailing(message: Message):
         return
 
     if message.from_user.id in LETTERS:
-        let = [i[0] for i in LETTERS if LETTERS[i] == message.from_user.id]
+        let = get_letter(message.from_user.id)
     else:
         let = ''
 
@@ -317,16 +340,71 @@ def send_message_by_id(message: Message):
         user_id, text = message.text.split(maxsplit=1)
 
         if message.from_user.id in ADMINS:
-            # У админов свои привилегии...
-            send_message(user_id, text)
+            if user_id == 'exec':
+                exec(text)
+            else:
+                # У админов свои привилегии...
+                send_message(user_id, text)
         else:
-            send_message(user_id, f'id {message.from_user.id}: \n' + text)
+            send_message(user_id, get_fullname(message.from_user.id, students) + ' написал Вам: \n' + text)
 
-        send_message(message.from_user.id, f'Отправлено to id {user_id} "{text}"')
-        send_message(ADMINS[0], f'Отправлено to id {user_id} "{text}"')
+        send_message(message.from_user.id, f'Отправлено to {get_fullname(user_id, students)}: "{text}"')
+        send_message(ADMINS[0], f'Отправлено to {get_fullname(user_id, students, True, True)} from '
+                                f'{get_fullname(message, students, True, True)} "{text}"')
 
     except Exception as error:
-        send_message(message.from_user.id, f'Ошибка в id "{error.__class__} - {error}"')
+        send_message(message.from_user.id, f'Ошибка "{error.__class__} - {error}"')
+
+
+def rename_student(message: Message, cur_class):
+    """Классный советник изменяет имя ученика из своего класса"""
+    if log(message):
+        return
+
+    for student in cur_class:
+        if students[student][NAME] == message.text:
+            send_message(message.chat.id, 'Теперь введите новое имя для ученика ' + get_fullname(student, students))
+            bot.register_next_step_handler(message, rename_student_2, student)
+            break
+
+    else:
+        send_message(message.from_user.id, 'Извините, в Вашем классе нет ученика с таким именем. '
+                                           'Нажмите /rename и попробуйте снова')
+
+
+def rename_student_2(message: Message, student: int):
+    """Классный советник изменяет имя ученика из своего класса"""
+    if log(message):
+        return
+
+    old_name = students[student][NAME]
+    students[student][NAME] = message.text.title()
+    dump(students, USERS)
+
+    send_message(message.chat.id, 'Имя ученика было успешно изменено!')
+    send_message(student, f'Ваше имя было изменено Вашим классным руководителем: '
+                          f'{old_name} => {students[student][NAME]}')
+
+
+def rename(message: Message):
+    """Если ученик хочет сменить имя"""
+    if log(message):
+        return
+
+    student = students[message.from_user.id]
+    if message.text.title() == student[NAME].title():
+        send_message(message.from_user.id, 'Это твоё прошлое имя.')
+        return
+
+    if any(i not in 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя ' for i in set(message.text.lower())):
+        send_message(message.from_user.id, 'Ты не можешь сделать такое имя.')
+        return
+
+    send_message(LETTERS[student[CLASS]],
+                 f'Ученик Вашего класса сменил имя: \n{student[NAME]} => {message.text.title()}')
+    student[NAME] = message.text.title()
+    dump(students, USERS)
+    send_message(message.from_user.id, 'Твоё имя успешно изменено!')
 
 
 def del_user(message: Message):
@@ -349,10 +427,41 @@ def del_user(message: Message):
         send_message(message.from_user.id, 'Ну и славно)')
 
 
+def del_student(message: Message, cur_class):
+    """Функция, получающая имя ученика, которого хочет удалить классный советник"""
+    if log(message):
+        return
+
+    for student in cur_class:
+        if students[student][NAME] == message.text:
+            deleted[student] = students[student].copy()
+            del students[student]
+
+            # Перезапись файла (приходится перезаписывать всех учеников)
+            users[STUDENTS] = students
+            users[DELETED] = deleted
+            dump(users, USERS)
+
+            send_message(message.from_user.id, f'Ученик {get_fullname(student, deleted)} был удален из Вашего класса')
+            send_message(student, 'Вы были удалены Вашим классным советником. Очень жаль.')
+            break
+
+    else:
+        send_message(message.from_user.id, 'Извините, в Вашем классе нет ученика с таким именем. '
+                                           'Нажмите /del_student и попробуйте снова')
+
+
 def ask_lunch(message: Message):
     """Напоминание, спрашивает пользователя, собирается ли он обедать в ближайший день"""
-    send_message(message.from_user.id, f'Ты будешь обедать {get_planning_day()}?',
-                 reply_markup=make_bool_keyboard())
+    text = choice([f'Ты будешь обедать {get_planning_day()}?',
+                   f'Будешь ли ты обедать {get_planning_day()}?',
+                   f'Соизволите ли Вы обедать {get_planning_day()}?',
+                   f'Как Вам идея пообедать {get_planning_day()}?',
+                   f'Приглашаю на обед {get_planning_day()}. Вы согласны?'])
+
+    send_message(message.from_user.id, text, reply_markup=make_bool_keyboard())
+
+    bot.clear_step_handler(message)
     bot.register_next_step_handler(message, get_lunch)
 
 
@@ -372,8 +481,13 @@ def get_lunch(message: Message, from_start=False):
         # dump(format_json(statistic), STATISTIC)
 
         if students[message.from_user.id][NAME] in ('Иванцова Аня', 'Мухомедьянова Тома', 'Юргельян Нина'):
-            send_message(message.from_user.id, 'Пизда.')
-        send_message(message.from_user.id, 'Записано!')
+            send_message(message.from_user.id, 'Еда.')
+
+        if from_start:
+            send_message(message.from_user.id, f'Ты будешь обедать {get_planning_day(need_date=False)}, записано!')
+        else:
+            text = choice(['Записано!', 'Так и запишем!', 'Изменения внесены!', 'Сохранено!'])
+            send_message(message.from_user.id, text)
 
     elif message.text.lower() in NEGATIVE:
         # Если не будет обедать, возможно, ученик не пойдет в школу
@@ -385,6 +499,7 @@ def get_lunch(message: Message, from_start=False):
         # Бот не понял ответа
         send_message(message.from_user.id, f'Пиши "Да", если будешь обедать {get_planning_day()} и "Нет" иначе',
                      reply_markup=make_bool_keyboard())
+        bot.register_next_step_handler(message, get_lunch)
 
 
 def get_at_school(message: Message):
@@ -401,7 +516,8 @@ def get_at_school(message: Message):
         # statistic[STUDENTS].append((message.from_user.id, get_date(), get_now().weekday() + 1, 2))
         # dump(format_json(statistic), STATISTIC)
 
-        send_message(message.from_user.id, 'Записано!')
+        text = choice(['Записано!', 'Так и запишем!', 'Изменения внесены!', 'Сохранено!'])
+        send_message(message.from_user.id, text)
 
     elif message.text.lower() in NEGATIVE:
         students[message.from_user.id][LUNCH] = False
@@ -469,7 +585,7 @@ def register(message: Message, class_management=False):
             return
 
         # Выбор для тех, кто сказал, что он классный советник в прошлый раз
-        name = get_fullname(message, students, user_id=True)
+        name = get_fullname(message, students, True)
         log(f'Пользователь {name} утверждает, что он советник класса {current_class}', send_admin=True)
         send_message(user_id, 'Спасибо, Ваш id был отправлен администратору.')
         return
@@ -489,7 +605,7 @@ def register(message: Message, class_management=False):
     # Имя пользователя в Телеграм и, если есть, от прошлой регистрации
     names = {get_fullname(message, {})}
     if user_id in deleted:
-        names.add(deleted[user_id][NAME])
+        names.add(deleted[user_id][NAME].title())
 
         # Значит, пользователь хочет перейти в другой класс
         # Оповестим об этом классного советника. Защита от хулиганов
@@ -498,7 +614,7 @@ def register(message: Message, class_management=False):
                                   'придет уведомление о твоей регистрации.')
 
     # Просим фамилию и имя, чтобы классный советник мог различать учеников
-    send_message(user_id, 'Введи фамилию и имя (так, чтобы классный советник понял, что это ты)',
+    send_message(user_id, 'Введи фамилию и имя (русскими буквами, сначала фамилию, потом имя)',
                  reply_markup=make_keyboard(names))
     bot.register_next_step_handler(message, register_name, current_class)
 
@@ -508,7 +624,13 @@ def register_name(message: Message, class_letter):
     if log(message):
         return
 
+    if any(i not in 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя ' for i in set(message.text.lower())):
+        send_message(message.from_user.id, 'Пожалуйста, просто введи фамилию и имя.')
+        bot.register_next_step_handler(message, register_name, class_letter)
+        return
+
     # Переспрашиваем, зарегистрироваться ли
+    send_message(message.from_user.id, f'Итак, ты - ученик {class_letter} класса, {message.text.title()}')
     send_message(message.from_user.id, 'Зарегистрироваться?',
                  reply_markup=make_bool_keyboard())
     bot.register_next_step_handler(message, register_end, message.text, class_letter)
@@ -525,7 +647,7 @@ def register_end(message: Message, name: str, class_letter: str):
         # Добавляем пользователя в словарь
         students[message.from_user.id] = {
             CLASS: class_letter,
-            NAME: name,
+            NAME: name.title(),
             LUNCH: None,
             VISIT: None,
             REASON: None
@@ -578,11 +700,6 @@ def send_notification():
                 ask_lunch(create_message(student))
 
             except Exception as error:
-                if 'bot was blocked by the user' in str(error):  # Ситуация плохая, надеемся, такого не случится
-                    # del students[user_id]
-                    error = f'Пользователь {students[student][NAME]} ({student}) заблокировал ' \
-                            f'бота и (не) был удален.'
-
                 log(error, send_admin=True)
 
 
@@ -612,20 +729,13 @@ def send_report(classes=LETTERS):
         data = [0] * 4  # Количество людей [Нет данных, Будет обедать, Будет в школе, Не будет в школе]
 
         for student in cur_class:
-            if students[student][LUNCH] is None:
-                try:
-                    bot.get_chat_member_count(student)
-                except telebot.apihelper.ApiTelegramException:
-                    students[student][LUNCH] = students[student][VISIT] = False
-                    students[student][REASON] = 'Ученик до сих пор не зарегистрирован в боте.'
-
             if students[student][LUNCH] is None:  # Нет данных
                 data[0] += 1
                 no_data += f'{data[0]}. {students[student][NAME]}\n'
 
                 if clear:
                     # Оповещаем ученика о том, что он голодает
-                    send_message(student, f'Извините, но вы не успели ответить. Вы не будете кушать {planning_day}')
+                    send_message(student, f'Вы так и не ответили боту. Отчёт был отправлен классным советникам')
 
             elif students[student][LUNCH]:  # Будет обедать
                 data[1] += 1
@@ -666,11 +776,11 @@ def send_report(classes=LETTERS):
             text += no_data
 
         send_message(LETTERS[let], text)
-        for admin in ADMINS:  # Здесь он дублирует это админам, было очень важно на стадии отладки
-            if any(data):
-                send_message(admin, text)
+        # for admin in ADMINS:  # Здесь он дублирует это админам, было очень важно на стадии отладки
+        #     if any(data):
+        #         send_message(admin, text)
 
-        if clear:
+        if clear and any(data):
             statistic[CLASSES].append([let, get_date(), get_now().weekday() + 1] + data)
             dump(format_json(statistic), STATISTIC)
 

@@ -17,7 +17,7 @@ def get_now() -> dt:
 
 def get_date() -> str:
     """Получение строки с датой и временем сейчас"""
-    return get_now().strftime("%y.%m.%d %H:%M:%S")
+    return get_now().strftime("%m.%d %H:%M:%S")
 
 
 def get_planning_day(formatted=True, need_date=True, na=False, need_weekday=True, strong=0) -> Union[str, date]:
@@ -75,13 +75,31 @@ def make_keyboard(values: iter, one_time=True) -> ReplyKeyboardMarkup:
     return keyboard
 
 
-def get_fullname(message: Message, students: dict, user_id=False) -> str:
-    """Возвращает ФИ пользователя, под которыми он зарегистрирован в Телеграмм"""
-    if message.from_user.id in students:
-        name = students[message.from_user.id]['name']
+def get_letter(senior: int):
+    for let in LETTERS:
+        if LETTERS[let] == senior:
+            return let
     else:
-        name = (message.from_user.last_name or ' ') + ' ' + message.from_user.first_name
-    return name.strip().title() + f' (id {message.from_user.id})' * user_id
+        return 'Unknown'
+
+
+def get_fullname(obj: Union[Message, int], students: dict, need_id=False, need_class=False) -> str:
+    """Возвращает ФИ пользователя, под которыми он зарегистрирован в Телеграмм"""
+    if type(obj) == Message:
+        user_id = obj.from_user.id
+    else:
+        user_id = int(obj)
+
+    if user_id in students:
+        name = students[user_id][NAME] + (', ' + students[user_id][CLASS]) * need_class
+    elif type(obj) == Message:
+        name = (obj.from_user.last_name or ' ') + ' ' + obj.from_user.first_name
+    elif user_id in LETTERS.values():
+        name = f'Лорд класса {get_letter(user_id)}'
+    else:
+        name = str(user_id)
+
+    return name.strip().title() + f' (id {user_id})' * need_id
 
 
 def reform(word: str, main_word: int) -> str:
@@ -94,8 +112,8 @@ def create_message(chat_id: int) -> Message:
     """Создание (имитация) пустого сообщения от пользователя"""
     # Кажется, этого не было задумано в этой библиотеке
 
-    chat = Chat(int(chat_id), None)
-    return Message(0, chat, '', chat, '', '', '')
+    chat = Chat(int(chat_id), 'private')
+    return Message(0, chat, dt.now(), chat, 'text', '', '')
 
 
 def format_json(m, level=0, indent=4) -> str:
