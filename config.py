@@ -3,7 +3,9 @@ TOKEN = '5746985066:AAFDjggyRvcKo5nDnOct6JtbCsox6tCE65Q'
 ADMINS = [1089524173]
 
 # Время утренних напоминаний
-MORNING_TIME = '07:00'
+EARLY_MORNING_TIME = '07:00'
+# Время утренних напоминаний
+MORNING_TIME = '07:50'
 # Время вечерних напоминаний
 EVENING_TIME = '19:00'
 # Время напоминаний в пятницу на понедельник
@@ -64,4 +66,3 @@ CITIZEN = 'citizen'
 # Название списков, под которыми хранятся списки в файле users.json
 STUDENTS = 'students'
 CLASSES = 'classes'
-DELETED = 'deleted'

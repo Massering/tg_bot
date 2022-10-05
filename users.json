@@ -5,132 +5,163 @@
       "name": "Gorobetz Yura",
       "lunch": null,
       "school_visit": null,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1089219862": {
       "class": "ε (Эпсилон)",
       "name": "Ivanov Ivan",
       "lunch": null,
-      "school_visit": null
+      "school_visit": null,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1024648481": {
       "class": "η (Эта)",
       "name": "Tim",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1092602215": {
       "class": "ε (Эпсилон)",
       "name": "Vlad Sem",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1868213058": {
       "class": "ι (Йота)",
       "name": "Абакановский Влад",
-      "lunch": true,
-      "school_visit": true,
-      "citizen": false
+      "lunch": null,
+      "school_visit": null,
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1909915777": {
       "class": "χ (Хи)",
       "name": "Аболевич Данил",
-      "lunch": true,
+      "lunch": null,
       "school_visit": 2,
       "reason": "Заболел",
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "890446591": {
       "class": "γ (Гамма)",
       "name": "Авдеев Максим",
       "lunch": true,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "454676294": {
       "class": "δ (Дельта)",
       "name": "Александров Кирилл",
-      "lunch": true,
-      "school_visit": true,
-      "citizen": false
+      "lunch": null,
+      "school_visit": null,
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "5167914878": {
       "class": "χ (Хи)",
       "name": "Александров Лев",
-      "lunch": true,
-      "school_visit": true,
+      "lunch": null,
+      "school_visit": null,
       "citizen": true,
-      "breakfast": false,
-      "afternoon_snack": false
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "5404456024": {
       "class": "ζ (Дзета)",
       "name": "Алексеев Владислав",
       "lunch": null,
-      "school_visit": null
+      "school_visit": null,
+      "citizen": true,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1381644188": {
       "class": "γ (Гамма)",
       "name": "Ангелина Акимова",
-      "lunch": true,
-      "school_visit": true,
+      "lunch": null,
+      "school_visit": null,
       "reason": "Больное горло(последствия прививки от гриппа)",
       "citizen": true,
-      "breakfast": true,
-      "afternoon_snack": true
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1069088280": {
       "class": "ζ (Дзета)",
       "name": "Антон Конюков",
-      "lunch": true,
-      "school_visit": true,
+      "lunch": 2,
+      "school_visit": 2,
       "citizen": true,
       "breakfast": 2,
-      "afternoon_snack": true
+      "afternoon_snack": 2
     },
     "1356872427": {
       "class": "ζ (Дзета)",
       "name": "Арина",
-      "lunch": true,
+      "lunch": null,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "847568068": {
       "class": "δ (Дельта)",
       "name": "Атамасов Клим",
-      "lunch": true,
-      "school_visit": true,
-      "citizen": false
+      "lunch": null,
+      "school_visit": null,
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "881927381": {
       "class": "δ (Дельта)",
       "name": "Бабушкин Владимир",
       "lunch": 2,
-      "school_visit": true,
-      "citizen": false
+      "school_visit": null,
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1995978895": {
       "class": "δ (Дельта)",
       "name": "Баранцов Глеб",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "858573431": {
       "class": "ι (Йота)",
       "name": "Басков Никита",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "679548535": {
       "class": "η (Эта)",
       "name": "Баталов Илья",
-      "lunch": true,
-      "school_visit": true,
-      "citizen": false
+      "lunch": null,
+      "school_visit": null,
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "5113801796": {
       "class": "χ (Хи)",
@@ -144,25 +175,29 @@
     "1759835600": {
       "class": "χ (Хи)",
       "name": "Бондарев Антон",
-      "lunch": true,
-      "school_visit": true,
-      "citizen": false
+      "lunch": 2,
+      "school_visit": 2,
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "5105695036": {
       "class": "ε (Эпсилон)",
       "name": "Бордзикули",
-      "lunch": null,
-      "school_visit": null,
+      "lunch": 2,
+      "school_visit": 2,
       "citizen": true,
       "breakfast": null,
-      "afternoon_snack": null
+      "afternoon_snack": 2
     },
     "816765827": {
       "class": "ε (Эпсилон)",
       "name": "Борисевич Роман",
-      "lunch": true,
-      "school_visit": true,
-      "citizen": false
+      "lunch": 2,
+      "school_visit": 2,
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "583054176": {
       "class": "φ (Фи)",
@@ -178,31 +213,37 @@
       "name": "Бравая Елизавета",
       "lunch": true,
       "school_visit": true,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "2132709787": {
       "class": "γ (Гамма)",
       "name": "Буданов Кирилл",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1397625315": {
       "class": "φ (Фи)",
       "name": "Булдаков Арсений",
-      "lunch": true,
-      "school_visit": true,
+      "lunch": null,
+      "school_visit": null,
       "reason": "питер",
       "citizen": true,
-      "breakfast": true,
-      "afternoon_snack": true
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1165447922": {
       "class": "ι (Йота)",
       "name": "Бухтоярова Анастасия",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "863932360": {
       "class": "δ (Дельта)",
@@ -210,15 +251,17 @@
       "lunch": 2,
       "school_visit": 2,
       "citizen": true,
-      "breakfast": false,
+      "breakfast": null,
       "afternoon_snack": 2
     },
     "1263832945": {
       "class": "η (Эта)",
-      "name": "Вероника Потыкайлова",
-      "lunch": true,
-      "school_visit": true,
-      "citizen": false
+      "name": "Потыкайлова Вероника",
+      "lunch": null,
+      "school_visit": null,
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1397077808": {
       "class": "η (Эта)",
@@ -226,23 +269,26 @@
       "lunch": true,
       "school_visit": true,
       "citizen": true,
-      "breakfast": true,
-      "afternoon_snack": true
+      "breakfast": false,
+      "afternoon_snack": false
     },
     "803931816": {
       "class": "δ (Дельта)",
       "name": "Виктория Павлюкова",
-      "lunch": true,
+      "lunch": null,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "908522149": {
       "class": "φ (Фи)",
       "name": "Галанов Иван",
-      "lunch": true,
-      "school_visit": true,
+      "lunch": null,
+      "school_visit": null,
       "citizen": false,
-      "breakfast": true
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "999354474": {
       "class": "γ (Гамма)",
@@ -251,7 +297,7 @@
       "school_visit": 2,
       "citizen": true,
       "breakfast": 2,
-      "afternoon_snack": true
+      "afternoon_snack": null
     },
     "1618464557": {
       "class": "η (Эта)",
@@ -259,7 +305,7 @@
       "lunch": true,
       "school_visit": true,
       "citizen": true,
-      "breakfast": false,
+      "breakfast": true,
       "afternoon_snack": true
     },
     "890285619": {
@@ -277,14 +323,18 @@
       "name": "Дарья",
       "lunch": true,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1887611335": {
       "class": "δ (Дельта)",
       "name": "Дегтярев Виктор",
-      "lunch": true,
+      "lunch": null,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "2092040234": {
       "class": "χ (Хи)",
@@ -293,7 +343,7 @@
       "school_visit": 2,
       "citizen": true,
       "breakfast": 2,
-      "afternoon_snack": true
+      "afternoon_snack": null
     },
     "742579240": {
       "class": "ζ (Дзета)",
@@ -301,29 +351,35 @@
       "lunch": true,
       "school_visit": true,
       "citizen": true,
-      "breakfast": false,
+      "breakfast": 3,
       "afternoon_snack": true
     },
     "991597923": {
       "class": "δ (Дельта)",
       "name": "Дьяков Кирилл",
-      "lunch": true,
-      "school_visit": true,
-      "citizen": false
+      "lunch": null,
+      "school_visit": null,
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1032354854": {
       "class": "δ (Дельта)",
       "name": "Ефимкин Александр",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "700207524": {
       "class": "ζ (Дзета)",
       "name": "Закарлюка Иван",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1165152297": {
       "class": "ι (Йота)",
@@ -332,22 +388,26 @@
       "school_visit": true,
       "citizen": true,
       "breakfast": true,
-      "afternoon_snack": false
+      "afternoon_snack": true
     },
     "885136819": {
       "class": "η (Эта)",
       "name": "Зиганшина Алина",
       "lunch": 2,
       "school_visit": null,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1683394735": {
       "class": "η (Эта)",
       "name": "Зинатулин Максим",
       "lunch": 2,
-      "school_visit": 2,
+      "school_visit": true,
       "reason": "Заболел",
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1344741369": {
       "class": "ι (Йота)",
@@ -355,60 +415,72 @@
       "lunch": 2,
       "school_visit": 2,
       "reason": "Приятного аппетита",
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1047138873": {
       "class": "ζ (Дзета)",
       "name": "Иванцова Полина",
       "lunch": true,
       "school_visit": true,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1658331986": {
       "class": "γ (Гамма)",
       "name": "Иванченко Леонид",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1740176096": {
       "class": "χ (Хи)",
       "name": "Иконникова Дарья",
       "lunch": true,
       "school_visit": true,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1699471899": {
       "class": "φ (Фи)",
       "name": "Исаченко Матвей",
-      "lunch": true,
-      "school_visit": true,
-      "citizen": false
+      "lunch": 2,
+      "school_visit": 2,
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1961537774": {
       "class": "ζ (Дзета)",
       "name": "Исмагилова Полина",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1891091253": {
       "class": "η (Эта)",
       "name": "Казакова Влада",
-      "lunch": true,
-      "school_visit": true,
+      "lunch": 2,
+      "school_visit": 2,
       "citizen": true,
-      "breakfast": true,
-      "afternoon_snack": true
+      "breakfast": 2,
+      "afternoon_snack": null
     },
     "5289232851": {
       "class": "χ (Хи)",
       "name": "Катышева Алена",
       "lunch": 2,
-      "school_visit": true,
+      "school_visit": 2,
       "citizen": true,
       "breakfast": 3,
-      "afternoon_snack": true
+      "afternoon_snack": 2
     },
     "700026795": {
       "class": "ι (Йота)",
@@ -417,143 +489,171 @@
       "school_visit": 2,
       "citizen": true,
       "breakfast": 3,
-      "afternoon_snack": false
+      "afternoon_snack": null
     },
     "1983430649": {
       "class": "γ (Гамма)",
       "name": "Ким Арсений",
-      "lunch": true,
-      "school_visit": true,
+      "lunch": null,
+      "school_visit": null,
       "citizen": true,
-      "breakfast": true,
-      "afternoon_snack": true
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1245500653": {
       "class": "φ (Фи)",
       "name": "Киреев Никита",
-      "lunch": true,
-      "school_visit": true,
+      "lunch": null,
+      "school_visit": null,
       "citizen": true,
-      "breakfast": true,
-      "afternoon_snack": true
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1597501215": {
       "class": "ζ (Дзета)",
       "name": "Кириленко Захар",
-      "lunch": true,
-      "school_visit": true,
+      "lunch": null,
+      "school_visit": null,
       "citizen": true,
-      "breakfast": true,
-      "afternoon_snack": true
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "400435224": {
       "class": "ι (Йота)",
       "name": "Кишкин Алексей",
-      "lunch": true,
-      "school_visit": true,
-      "citizen": false
+      "lunch": 2,
+      "school_visit": 2,
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "781105238": {
       "class": "γ (Гамма)",
       "name": "Климова Мария",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1997463532": {
       "class": "η (Эта)",
       "name": "Кожура Илья",
       "lunch": true,
       "school_visit": true,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1503984259": {
       "class": "η (Эта)",
       "name": "Колпаков Иван",
       "lunch": true,
       "school_visit": true,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "957803913": {
       "class": "χ (Хи)",
       "name": "Копылов Эрик",
-      "lunch": true,
-      "school_visit": true,
-      "reason": "Болею.",
-      "citizen": false
+      "lunch": null,
+      "school_visit": null,
+      "reason": "Ухожу с утра к стоматологу.",
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "402959872": {
       "class": "δ (Дельта)",
       "name": "Король",
-      "lunch": true,
-      "school_visit": true,
+      "lunch": null,
+      "school_visit": null,
       "reason": "мрц",
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "575700583": {
       "class": "ε (Эпсилон)",
       "name": "Кривоносов Денис",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1077065241": {
       "class": "μ (Мю)",
       "name": "Кузьмина Дарья",
-      "lunch": true,
-      "school_visit": true,
-      "citizen": false
+      "lunch": null,
+      "school_visit": null,
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1152259753": {
       "class": "φ (Фи)",
       "name": "Левченко Маргарита",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1258090705": {
       "class": "ζ (Дзета)",
       "name": "Локотецких Валерия",
-      "lunch": true,
-      "school_visit": true,
-      "citizen": false
+      "lunch": null,
+      "school_visit": null,
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1259402746": {
       "class": "χ (Хи)",
       "name": "Лужников Сергей",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "994326271": {
       "class": "χ (Хи)",
       "name": "Лушникова Екатерина",
-      "lunch": true,
-      "school_visit": true,
+      "lunch": null,
+      "school_visit": null,
       "citizen": true,
-      "breakfast": false,
-      "afternoon_snack": false
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1004343580": {
       "class": "φ (Фи)",
       "name": "Максим Фадин",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1851426470": {
       "class": "δ (Дельта)",
       "name": "Малиновский Александр",
       "lunch": true,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1433744803": {
       "class": "η (Эта)",
       "name": "Маргарита Шмидт",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "2118321692": {
       "class": "γ (Гамма)",
@@ -561,15 +661,17 @@
       "lunch": null,
       "school_visit": null,
       "citizen": true,
-      "breakfast": true,
+      "breakfast": 2,
       "afternoon_snack": null
     },
     "1019627968": {
       "class": "γ (Гамма)",
       "name": "Марина Шин",
-      "lunch": true,
-      "school_visit": true,
-      "citizen": false
+      "lunch": null,
+      "school_visit": null,
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "783782556": {
       "class": "γ (Гамма)",
@@ -578,46 +680,52 @@
       "school_visit": 2,
       "citizen": true,
       "breakfast": 2,
-      "afternoon_snack": false
+      "afternoon_snack": 2
     },
     "1061139622": {
       "class": "ι (Йота)",
       "name": "Марьясов Владимир",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "906734466": {
       "class": "χ (Хи)",
       "name": "Маслюков Георгий",
-      "lunch": true,
-      "school_visit": true,
+      "lunch": null,
+      "school_visit": null,
       "citizen": true,
-      "breakfast": false,
-      "afternoon_snack": true
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "862648085": {
       "class": "χ (Хи)",
       "name": "Мельниченко Таисия",
-      "lunch": true,
-      "school_visit": true,
+      "lunch": null,
+      "school_visit": null,
       "citizen": true,
-      "breakfast": true,
-      "afternoon_snack": false
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "844186274": {
       "class": "δ (Дельта)",
       "name": "Михайлов Глеб",
       "lunch": true,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "783812191": {
       "class": "ε (Эпсилон)",
       "name": "Михневич Катя",
-      "lunch": true,
-      "school_visit": true,
-      "citizen": false
+      "lunch": null,
+      "school_visit": null,
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1883271571": {
       "class": "ι (Йота)",
@@ -643,21 +751,27 @@
       "name": "Мухомедьянова Тома",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1060193414": {
       "class": "ε (Эпсилон)",
       "name": "НЕтесов Иван",
-      "lunch": true,
+      "lunch": 2,
       "school_visit": true,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "788729669": {
       "class": "η (Эта)",
       "name": "Нестреляева Виктория",
-      "lunch": true,
+      "lunch": null,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "884131205": {
       "class": "ζ (Дзета)",
@@ -672,95 +786,111 @@
     "570255025": {
       "class": "δ (Дельта)",
       "name": "Оля Токарева",
-      "lunch": null,
-      "school_visit": null,
+      "lunch": 2,
+      "school_visit": 2,
       "citizen": true,
-      "breakfast": null,
-      "afternoon_snack": null
+      "breakfast": 2,
+      "afternoon_snack": 2
     },
     "808403694": {
       "class": "χ (Хи)",
       "name": "Орлов Игорь",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "485766896": {
       "class": "φ (Фи)",
       "name": "Орлова Арина",
-      "lunch": true,
-      "school_visit": true,
+      "lunch": null,
+      "school_visit": null,
       "citizen": true,
-      "breakfast": false,
-      "afternoon_snack": true
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1121624532": {
       "class": "δ (Дельта)",
       "name": "Пахомова Милена",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "663072383": {
       "class": "ε (Эпсилон)",
       "name": "Пиксаев Роман",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1959369889": {
       "class": "γ (Гамма)",
       "name": "Пинаева Мария",
-      "lunch": true,
+      "lunch": null,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1233120388": {
       "class": "χ (Хи)",
       "name": "Поддубная Дарья",
       "lunch": true,
       "school_visit": true,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1950633799": {
       "class": "γ (Гамма)",
       "name": "Поляков Денис",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1509494385": {
       "class": "η (Эта)",
       "name": "Понасенко Александр",
-      "lunch": true,
-      "school_visit": true,
+      "lunch": null,
+      "school_visit": null,
       "citizen": true,
-      "breakfast": true,
-      "afternoon_snack": false
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1959172937": {
       "class": "δ (Дельта)",
       "name": "Поневежская Варвара",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "603377678": {
       "class": "ι (Йота)",
       "name": "Попов Вадим",
-      "lunch": true,
-      "school_visit": true,
+      "lunch": null,
+      "school_visit": null,
       "reason": "Нога",
       "citizen": true,
-      "breakfast": false,
-      "afternoon_snack": false
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1069934389": {
       "class": "ι (Йота)",
       "name": "Постоева Анастасия",
       "lunch": null,
       "school_visit": null,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "626023413": {
       "class": "γ (Гамма)",
@@ -775,21 +905,27 @@
       "class": "ζ (Дзета)",
       "name": "Провалинский Данил",
       "lunch": null,
-      "school_visit": null
+      "school_visit": null,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1469599903": {
       "class": "ζ (Дзета)",
       "name": "Прудников Андрей",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1384339993": {
       "class": "δ (Дельта)",
       "name": "Редько Сергей",
       "lunch": true,
       "school_visit": true,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1282748443": {
       "class": "γ (Гамма)",
@@ -805,7 +941,9 @@
       "name": "Ровняго Дмитрий",
       "lunch": null,
       "school_visit": null,
-      "reason": "Болею"
+      "reason": "Болею",
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "827790445": {
       "class": "η (Эта)",
@@ -813,15 +951,17 @@
       "lunch": 2,
       "school_visit": 2,
       "citizen": true,
-      "breakfast": false,
+      "breakfast": 2,
       "afternoon_snack": 2
     },
     "809423690": {
       "class": "η (Эта)",
       "name": "Романченко Софья",
-      "lunch": true,
-      "school_visit": true,
-      "citizen": false
+      "lunch": null,
+      "school_visit": null,
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1089524173": {
       "class": "ι (Йота)",
@@ -830,65 +970,79 @@
       "school_visit": 2,
       "citizen": true,
       "breakfast": 2,
-      "afternoon_snack": true
+      "afternoon_snack": null
     },
     "979923466": {
       "class": "ι (Йота)",
       "name": "Сoвкова София",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1110786320": {
       "class": "η (Эта)",
       "name": "Садовский Виктор",
-      "lunch": false,
+      "lunch": null,
       "school_visit": null,
       "citizen": true,
-      "breakfast": false,
-      "afternoon_snack": false
+      "breakfast": null,
+      "afternoon_snack": 3
     },
     "1421715607": {
       "class": "μ (Мю)",
       "name": "Самойленко Настя",
-      "lunch": true,
-      "school_visit": true,
-      "citizen": false
+      "lunch": null,
+      "school_visit": null,
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "957952960": {
       "class": "χ (Хи)",
       "name": "Сахнов Данила",
       "lunch": 2,
-      "school_visit": true,
-      "citizen": false
+      "school_visit": null,
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1069912335": {
       "class": "γ (Гамма)",
       "name": "Саян",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "660379735": {
       "class": "γ (Гамма)",
       "name": "Ситникова Даша",
-      "lunch": true,
-      "school_visit": true,
-      "citizen": false
+      "lunch": null,
+      "school_visit": null,
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1822590281": {
       "class": "ι (Йота)",
       "name": "Скурковин Егор",
       "lunch": true,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1641475130": {
       "class": "η (Эта)",
       "name": "Слугин Максим",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "5061564644": {
       "class": "φ (Фи)",
@@ -897,13 +1051,13 @@
       "school_visit": 2,
       "citizen": true,
       "breakfast": 2,
-      "afternoon_snack": true
+      "afternoon_snack": null
     },
     "1192660762": {
       "class": "χ (Хи)",
       "name": "Соболев Сергей",
-      "lunch": true,
-      "school_visit": true,
+      "lunch": 2,
+      "school_visit": 2,
       "citizen": true,
       "breakfast": true,
       "afternoon_snack": 2
@@ -911,58 +1065,66 @@
     "408045956": {
       "class": "ι (Йота)",
       "name": "Соловьев Игорь",
-      "lunch": false,
+      "lunch": 3,
       "school_visit": null,
       "reason": "Болезнь",
       "citizen": true,
-      "breakfast": false,
-      "afternoon_snack": false
+      "breakfast": null,
+      "afternoon_snack": 3
     },
     "1497238023": {
       "class": "ζ (Дзета)",
       "name": "Степанова Юлия",
       "lunch": 2,
-      "school_visit": true,
-      "citizen": false
+      "school_visit": null,
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1959214466": {
       "class": "φ (Фи)",
       "name": "Судиловский Данил",
-      "lunch": true,
-      "school_visit": true,
-      "citizen": false
+      "lunch": null,
+      "school_visit": null,
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "5004573631": {
       "class": "φ (Фи)",
       "name": "Тимофеев Владимир",
-      "lunch": false,
-      "school_visit": false,
+      "lunch": null,
+      "school_visit": null,
       "reason": "Будет официальное открытие программы и все уедут на открытие",
       "citizen": true,
-      "breakfast": false,
-      "afternoon_snack": false
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "932558401": {
       "class": "φ (Фи)",
       "name": "Усачёв Семён",
       "lunch": null,
       "school_visit": null,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "418211392": {
       "class": "ζ (Дзета)",
       "name": "Фадеев Кирилл",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "2012437173": {
       "class": "γ (Гамма)",
       "name": "Фаилов Кирилл",
-      "lunch": false,
-      "school_visit": false,
+      "lunch": 2,
+      "school_visit": 2,
       "citizen": true,
-      "breakfast": false,
+      "breakfast": 2,
       "afternoon_snack": false,
       "reason": "Нужно сходить в поликлинику"
     },
@@ -971,7 +1133,9 @@
       "name": "Халекова Полина",
       "lunch": true,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1325131872": {
       "class": "ε (Эпсилон)",
@@ -979,16 +1143,18 @@
       "lunch": true,
       "school_visit": true,
       "reason": "Лечение",
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1279274762": {
       "class": "η (Эта)",
       "name": "Хорошилов Никита",
-      "lunch": false,
-      "school_visit": false,
+      "lunch": null,
+      "school_visit": null,
       "citizen": true,
-      "breakfast": false,
-      "afternoon_snack": false,
+      "breakfast": null,
+      "afternoon_snack": null,
       "reason": "Он уже в курсе"
     },
     "1016660159": {
@@ -996,7 +1162,9 @@
       "name": "Чаплыгина Екатерина",
       "lunch": true,
       "school_visit": true,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1326473848": {
       "class": "φ (Фи)",
@@ -1004,7 +1172,9 @@
       "citizen": false,
       "lunch": 2,
       "school_visit": 2,
-      "reason": null
+      "reason": null,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1020737893": {
       "class": "χ (Хи)",
@@ -1020,7 +1190,9 @@
       "name": "Чернышев Марк",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "695919278": {
       "class": "δ (Дельта)",
@@ -1028,15 +1200,17 @@
       "lunch": null,
       "school_visit": null,
       "citizen": true,
-      "breakfast": null,
-      "afternoon_snack": null
+      "breakfast": 3,
+      "afternoon_snack": 3
     },
     "1796430434": {
       "class": "δ (Дельта)",
       "name": "Шемелов Антон",
-      "lunch": true,
+      "lunch": null,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1734504692": {
       "class": "ζ (Дзета)",
@@ -1044,54 +1218,62 @@
       "lunch": 2,
       "school_visit": 2,
       "citizen": true,
-      "breakfast": false,
-      "afternoon_snack": true
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1831580928": {
       "class": "ι (Йота)",
       "name": "Шкредов Сергей",
       "lunch": 2,
       "school_visit": null,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1795780447": {
       "class": "γ (Гамма)",
       "name": "Шкутан Максим",
-      "lunch": null,
-      "school_visit": null,
-      "citizen": false
+      "lunch": 2,
+      "school_visit": 2,
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1098725944": {
       "class": "ε (Эпсилон)",
       "name": "Шмаков Валерий",
-      "lunch": true,
-      "school_visit": true,
+      "lunch": null,
+      "school_visit": null,
       "citizen": true,
-      "breakfast": true,
-      "afternoon_snack": true
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "5158092755": {
       "class": "ζ (Дзета)",
       "name": "Шмурова Анна",
-      "lunch": false,
+      "lunch": null,
       "school_visit": null,
       "citizen": true,
-      "breakfast": false,
-      "afternoon_snack": false
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1998062038": {
       "class": "ι (Йота)",
       "name": "Юргельян Нина",
-      "lunch": true,
-      "school_visit": true,
-      "citizen": false
+      "lunch": 2,
+      "school_visit": 2,
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "1987908012": {
       "class": "ι (Йота)",
       "name": "Яковлев Демьян",
       "lunch": 2,
       "school_visit": 2,
-      "citizen": false
+      "citizen": false,
+      "breakfast": null,
+      "afternoon_snack": null
     },
     "873347082": {
       "class": "ζ (Дзета)",
@@ -1100,21 +1282,7 @@
       "school_visit": 2,
       "citizen": true,
       "breakfast": 2,
-      "afternoon_snack": true
-    }
-  },
-  "deleted": {
-    "1430032907": {
-      "class": "ι (Йота)",
-      "name": "Барон Владислав",
-      "lunch": null,
-      "school_visit": null
-    },
-    "792177799": {
-      "class": "φ (Фи)",
-      "name": "Поздняков Никита",
-      "lunch": null,
-      "school_visit": null
+      "afternoon_snack": null
     }
   },
   "classes": {
@@ -1123,7 +1291,7 @@
     "δ (Дельта)": 438057772,
     "ε (Эпсилон)": 421885070,
     "ζ (Дзета)": 671488345,
-    "η (Эта)": 1154607773,
+    "η (Эта)": 927613260,
     "θ (Тета)": 6,
     "ι (Йота)": 812263756,
     "κ (Каппа)": 8,

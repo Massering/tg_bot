@@ -2,3 +2,4 @@ schedule==1.1.0
 requests~=2.27.1
 pymorphy2~=0.9.1
 pyTelegramBotAPI==4.4.0
+SQLAlchemy~=1.4.41
