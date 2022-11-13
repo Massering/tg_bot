@@ -27,8 +27,8 @@ def get_planning_day(formatted=True, need_date=True, na=False, need_weekday=True
     friday_report_time = now.replace(**dict(zip(['hour', 'minute'], map(int, FRIDAY_REPORT_TIME.split(':')))))
 
     #         ПН    ВТ    СР    ЧТ    ПТ    СБ   ВС
-    delta = [1, 2, 1, 2, 1, 2, 1, 2, 1, 4, 3, 3, 2, 2][now.weekday() * 2 + (now > report_time + td(minutes=strong * 5))]
-    if now.weekday() == 4 and report_time + td(minutes=strong * 5) < now < friday_report_time:
+    delta = [1, 2, 1, 2, 1, 2, 1, 2, 1, 4, 3, 3, 2, 2][now.weekday() * 2 + (now >= report_time + td(minutes=strong * 5))]
+    if now.weekday() == 4 and report_time + td(minutes=strong * 5) <= now < friday_report_time + td(minutes=strong * 5):
         delta -= 1
 
     planning_date = now + td(days=delta)

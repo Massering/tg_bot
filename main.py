@@ -27,7 +27,7 @@ if not os.path.exists(USERS):
     }, USERS)
 
 users = json.load(open(USERS, 'r', encoding=ENCODING))
-students = {int(i): users[STUDENTS][i] for i in sorted(users[STUDENTS])}
+students = {int(i): users[STUDENTS][i] for i in sorted(users[STUDENTS], key=lambda x: (users[STUDENTS][x][CLASS], users[STUDENTS][x][NAME]))}
 LETTERS = {i: users[CLASSES][i] for i in users[CLASSES]}
 users = {
     STUDENTS: students,
@@ -47,23 +47,29 @@ def send_message(user_id: int, text: Union[str, list], reply_markup=None):
     # Помечаем в консоль отправку
     log((text, user_id))
 
+    many_errors = 0
+    error = 'Из-за отключения интернета бот не может отправить сообщение'
     while 1:
         try:
             bot.send_message(user_id, text, reply_markup=reply_markup)
+            if many_errors:
+                log(str(error) + f' x{many_errors}', send_admin=True, to_file=True)
+                many_errors = 0
             break
-        except Exception as error:
-            if 'Failed to establish a new connection' in str(error):
+        except Exception as err:
+            if 'Failed to establish a new connection' in str(err):
                 error = 'Из-за отключения интернета бот не может отправить сообщение'
-                log(error, to_file=True)
+                many_errors += 1
+                # log(error, to_file=True)
                 sleep(30)
             else:
-                if 'bot was blocked by the user' in str(error):  # Ситуация плохая, надеемся, такого не случится
+                if 'bot was blocked by the user' in str(err):  # Ситуация плохая, надеемся, такого не случится
                     error = f'Пользователь {get_fullname(user_id, True, True)} заблокировал ' \
                             f'бота и был удален.'
                     # del students[user_id]
                     # dump(users, USERS)
 
-                elif 'chat not found' in str(error):
+                elif 'chat not found' in str(err):
                     if user_id in students:
                         error = f'Ученик {get_fullname(user_id, True, True)}'
                     elif user_id in LETTERS.values():
@@ -73,6 +79,11 @@ def send_message(user_id: int, text: Union[str, list], reply_markup=None):
                     error += f' всё ещё не написал боту!'
                 log(error)
                 break
+
+
+def register_next_step_handler(message: Message, callback: callable, *args, **kwargs):
+    bot.clear_step_handler(message)
+    bot.register_next_step_handler(message, callback, *args, **kwargs)
 
 
 def get_fullname(obj: Union[Message, int, str], need_id=False, need_class=False) -> str:
@@ -213,20 +224,20 @@ def start(message: Message):
         if user_id not in students:  # Если ученик не зарегистрирован, предлагаем сделать это
             send_message(chat_id, 'Хочешь зарегистрироваться? (Если Вы - учитель, Вам тоже следует зарегистрироваться)',
                          reply_markup=bool_keyboard())
-            bot.register_next_step_handler(message, if_register)
+            register_next_step_handler(message, if_register)
         else:
             send_message(chat_id, 'Ты уже зарегистрирован в системе!')
 
     elif message.text == '/send_message':
         # Функция, чтобы отправлять другому пользователю сообщение, зная его id или имя
         send_message(chat_id, 'Введи id или точное имя пользователя')
-        bot.register_next_step_handler(message, send_message_by_id)
+        register_next_step_handler(message, send_message_by_id)
 
     elif message.text == '/mailing' and user_id in ADMINS + [*LETTERS.values()]:
         # Рассылка от имени бота ВСЕМ зарегистрированным ученикам
         # Только для администраторов (и классных советников)
         send_message(chat_id, 'Введите сообщение. Будьте аккуратны, это сообщение будет отправлено всем Вашим ученикам')
-        bot.register_next_step_handler(message, mailing)
+        register_next_step_handler(message, mailing)
 
     elif '/make_lord' in message.text.lower() and user_id in ADMINS:
         lord_id, class_letter = message.text.split(maxsplit=1)[1].split('=')
@@ -261,12 +272,12 @@ def start(message: Message):
         elif message.text == '/rename':
             send_message(chat_id, 'Выберите из списка имя того, кого хотите переименовать',
                          reply_markup=class_list)
-            bot.register_next_step_handler(message, rename, cur_class)
+            register_next_step_handler(message, rename, cur_class)
 
         elif message.text == '/del_student':
             send_message(chat_id, 'Выберите из списка имя того, кого хотите удалить',
                          reply_markup=class_list)
-            bot.register_next_step_handler(message, del_user, cur_class)
+            register_next_step_handler(message, del_student, cur_class)
 
         else:
             # Иначе даем список команд
@@ -275,7 +286,7 @@ def start(message: Message):
 Список команд классных советников:
 /my_class - получить список зарегистрированных учеников моего класса
 /report - получить отчет о собранной на данный момент информации
-/mailing - отправить всем ученикам Вашего класса сообщение, которое вы введёте
+/mailing - разослать всем ученикам класса сообщение через бота
 /del_student - удалить ученика из списка Вашего класса
 
 Команды можно исполнять просто нажимая на слово после знака "/"
@@ -284,7 +295,7 @@ def start(message: Message):
     elif user_id not in students:  # Если ученик не зарегистрирован, предлагаем сделать это
         send_message(chat_id, 'Хочешь зарегистрироваться?',
                      reply_markup=bool_keyboard())
-        bot.register_next_step_handler(message, if_register)
+        register_next_step_handler(message, if_register)
 
     elif message.text == '/change_dormility':
         students[user_id][CITIZEN] = not students[user_id].get(CITIZEN, False)
@@ -300,14 +311,14 @@ def start(message: Message):
 
     elif message.text == '/rename':
         send_message(chat_id, 'Введи новое имя')
-        bot.register_next_step_handler(message, rename)
+        register_next_step_handler(message, rename)
 
     elif message.text == '/del_myself':
         # Удаление ученика из системы
         # Например, исключен из школы
         send_message(chat_id, 'Ты уверен, что хочешь удалить свои данные из системы?',
                      reply_markup=bool_keyboard())
-        bot.register_next_step_handler(message, del_user)
+        register_next_step_handler(message, del_user)
 
     else:
         ask_all(message, from_start=True)
@@ -352,7 +363,7 @@ def send_message_by_id(message: Message):
     if message.text.lower() == 'exec':
         if message.from_user.id in ADMINS:
             send_message(message.chat.id, 'Теперь введи команду')
-            bot.register_next_step_handler(message, send_message_by_id_1, 'exec')
+            register_next_step_handler(message, send_message_by_id_1, 'exec')
         else:
             send_message(message.chat.id, 'Извини, но ты не администратор')
         return
@@ -360,14 +371,14 @@ def send_message_by_id(message: Message):
     try:
         if int(message.text) in students:
             send_message(message.chat.id, f'Получатель найден: {get_fullname(int(message.text), True, True)}')
-            bot.register_next_step_handler(message, send_message_by_id_1, int(message.text))
+            register_next_step_handler(message, send_message_by_id_1, int(message.text))
             return
 
     except ValueError:
         for student in students:
             if students[student][NAME].lower() == message.text.lower():
                 send_message(message.chat.id, f'Получатель найден: {get_fullname(student, True, True)}')
-                bot.register_next_step_handler(message, send_message_by_id_1, student)
+                register_next_step_handler(message, send_message_by_id_1, student)
                 return
 
     except Exception as error:
@@ -375,7 +386,7 @@ def send_message_by_id(message: Message):
 
     send_message(message.chat.id, 'Проведя тщательный поиск по id и именам, я так и не нашёл этого человека. '
                                   'Попробуй ещё.')
-    bot.register_next_step_handler(message, send_message_by_id)
+    register_next_step_handler(message, send_message_by_id)
 
 
 def send_message_by_id_1(message: Message, recipient_id):
@@ -412,7 +423,7 @@ def rename_student(message: Message, cur_class):
     for student in cur_class:
         if students[student][NAME] == message.text:
             send_message(message.chat.id, 'Теперь введите новое имя для ученика ' + get_fullname(student))
-            bot.register_next_step_handler(message, rename_student_2, student)
+            register_next_step_handler(message, rename_student_2, student)
             break
 
     else:
@@ -510,28 +521,34 @@ def ask_all(message: Message, from_start=False, from_function=False):
     lunch = students[user_id].get(LUNCH)
     poldnik = students[user_id].get(POLDNIK)
 
+    # Опять же, чтобы не вызывалось по выходным и праздникам
+    planning_day = get_planning_day(formatted=False, strong=1).strftime("%d.%m")
+    if planning_day in HOLIDAYS:
+        send_message(user_id, REST)
+        return
+
     if students[user_id].get(CITIZEN) is None:
         send_message(chat_id, 'Ты проживаешь в общаге?', reply_markup=bool_keyboard())
-        bot.register_next_step_handler(message, get_dormitory)
+        register_next_step_handler(message, get_dormitory)
         return
 
     if students[user_id][CITIZEN] and breakfast is None:
         text = choice(ASKS) % ('завтрак', get_planning_day())
 
         send_message(chat_id, text, reply_markup=choice_keyboard())
-        bot.register_next_step_handler(message, get_answer, BREAKFAST)
+        register_next_step_handler(message, get_answer, BREAKFAST)
 
     elif lunch is None:
         text = choice(ASKS) % ('обед', get_planning_day())
 
         send_message(chat_id, text, reply_markup=choice_keyboard())
-        bot.register_next_step_handler(message, get_answer, LUNCH)
+        register_next_step_handler(message, get_answer, LUNCH)
 
     elif students[user_id][CITIZEN] and poldnik is None:
         text = choice(ASKS[:-1]) % ('полднич', get_planning_day())
 
         send_message(chat_id, text, reply_markup=choice_keyboard())
-        bot.register_next_step_handler(message, get_answer, POLDNIK)
+        register_next_step_handler(message, get_answer, POLDNIK)
 
     elif students[user_id].get(VISIT) is None:
         if lunch in (True, 2):
@@ -540,24 +557,24 @@ def ask_all(message: Message, from_start=False, from_function=False):
             ask_all(message, from_function=True)
 
         else:
-            text = choice([f'А в школу пойдёшь?'])
+            text = ['А в школу пойдёшь?']
 
             send_message(chat_id, text, reply_markup=choice_keyboard())
-            bot.register_next_step_handler(message, get_visit)
+            register_next_step_handler(message, get_visit)
 
     elif from_start:
         if students[user_id][CITIZEN]:
             send_message(chat_id, 'Выбери, какой выбор ты хочешь перезаписать',
                          reply_markup=change_keyboard(students[user_id]))
-            bot.register_next_step_handler(message, del_choose)
+            register_next_step_handler(message, del_choose)
 
         else:
             send_message(chat_id, choice(ASKS) % ('обед', get_planning_day()),
                          reply_markup=choice_keyboard())
-            bot.register_next_step_handler(message, get_answer, LUNCH)
+            register_next_step_handler(message, get_answer, LUNCH)
 
     else:
-        send_message(chat_id, choice(FINISHED))
+        send_message(chat_id, FINISHED)
 
 
 def del_choose(message: Message):
@@ -582,9 +599,9 @@ def del_choose(message: Message):
         students[user_id][VISIT] = None
 
     else:
-        send_message(message.chat.id, choice(DO_NOT_UNDERSTAND),
+        send_message(message.chat.id, DO_NOT_UNDERSTAND,
                      reply_markup=change_keyboard(students[user_id]))
-        bot.register_next_step_handler(message, del_choose)
+        register_next_step_handler(message, del_choose)
         return
 
     dump(users, USERS)
@@ -612,9 +629,9 @@ def get_answer(message: Message, mealtime):
 
     else:
         # Бот не понял ответа
-        send_message(message.chat.id, choice(DO_NOT_UNDERSTAND),
-                     reply_markup=bool_keyboard())
-        bot.register_next_step_handler(message, get_answer, mealtime)
+        send_message(message.chat.id, DO_NOT_UNDERSTAND,
+                     reply_markup=choice_keyboard())
+        register_next_step_handler(message, get_answer, mealtime)
         return
 
     dump(users, USERS)
@@ -628,20 +645,20 @@ def get_visit(message: Message):
 
     if message.text.lower() not in POSSIBLE_ANSWERS:
         # Бот не понял ответа
-        send_message(message.chat.id, choice(DO_NOT_UNDERSTAND),
+        send_message(message.chat.id, DO_NOT_UNDERSTAND,
                      reply_markup=choice_keyboard())
-        bot.register_next_step_handler(message, get_visit)
+        register_next_step_handler(message, get_visit)
         return
 
     if message.text.lower() in POSITIVE + PERMANENTLY:
         students[message.from_user.id][VISIT] = True if message.text.lower() in POSITIVE else 2
-        send_message(message.chat.id, choice(FINISHED))
+        send_message(message.chat.id, FINISHED)
 
     else:
         students[message.from_user.id][VISIT] = False if message.text.lower() in NEGATIVE else 3
         send_message(message.chat.id, 'Пожалуйста, укажи причину для твоего классного советника.',
                      reply_markup=keyboard([students[message.from_user.id].get(REASON) or '']))
-        bot.register_next_step_handler(message, get_no_visit_reason)
+        register_next_step_handler(message, get_no_visit_reason)
 
     dump(users, USERS)
 
@@ -654,7 +671,7 @@ def get_no_visit_reason(message: Message):
     if message.text.lower() in POSSIBLE_ANSWERS or len(message.text) < 3:
         # Заставим написать настоящую причину + защита от случайного нажатия (Нет -> Нет -> Нет)
         send_message(message.chat.id, 'Я не верю, что это причина, пожалуйста, напиши нормально')
-        bot.register_next_step_handler(message, get_no_visit_reason)
+        register_next_step_handler(message, get_no_visit_reason)
 
     else:
         students[message.from_user.id][REASON] = message.text
@@ -668,9 +685,9 @@ def get_dormitory(message: Message):
         return
 
     if message.text.lower() not in NEGATIVE + POSITIVE:
-        send_message(message.chat.id, choice(DO_NOT_UNDERSTAND),
+        send_message(message.chat.id, DO_NOT_UNDERSTAND,
                      reply_markup=bool_keyboard())
-        bot.register_next_step_handler(message, get_dormitory)
+        register_next_step_handler(message, get_dormitory)
         return
 
     students[message.from_user.id][CITIZEN] = message.text.lower() in NEGATIVE
@@ -678,7 +695,7 @@ def get_dormitory(message: Message):
         del students[message.from_user.id]['permanently']
     dump(users, USERS)
 
-    send_message(message.chat.id, choice(FINISHED))
+    send_message(message.chat.id, FINISHED)
     ask_all(message, from_function=True)
 
 
@@ -691,7 +708,7 @@ def if_register(message: Message):
         # Для классных советников отдельный класс (надеюсь, ученики не будут выбирать его)
         send_message(message.chat.id, 'Выбери класс',
                      reply_markup=keyboard([LORD_OF_CLASS] + [*LETTERS]))
-        bot.register_next_step_handler(message, register)
+        register_next_step_handler(message, register)
     else:
         send_message(message.chat.id, 'Нет так нет')
 
@@ -710,7 +727,7 @@ def register(message: Message, lord_of_class=False):
         if current_class not in LETTERS:
             send_message(chat_id, 'Такого класса не найдено. Попробуйте ещё раз',
                          reply_markup=keyboard(LETTERS))
-            bot.register_next_step_handler(message, register)
+            register_next_step_handler(message, register)
             return
 
         # Выбор для тех, кто сказал, что он классный советник в прошлый раз
@@ -723,13 +740,13 @@ def register(message: Message, lord_of_class=False):
     if current_class == LORD_OF_CLASS:
         # Предлагаем выбрать класс "управления"
         send_message(chat_id, 'Пожалуйста, выберите, каким классом Вы повелеваете', reply_markup=keyboard(LETTERS))
-        bot.register_next_step_handler(message, register, lord_of_class=True)
+        register_next_step_handler(message, register, lord_of_class=True)
         return
 
     if current_class not in LETTERS:
         send_message(chat_id, 'Такого класса не найдено. Попробуй ещё раз',
                      reply_markup=keyboard([*LETTERS] + [LORD_OF_CLASS]))
-        bot.register_next_step_handler(message, register)
+        register_next_step_handler(message, register)
         return
 
     # Имя пользователя в Телеграм
@@ -738,7 +755,7 @@ def register(message: Message, lord_of_class=False):
     # Просим фамилию и имя, чтобы классный советник мог различать учеников
     send_message(chat_id, 'Введи фамилию и имя (русскими буквами, сначала фамилию, потом имя)',
                  reply_markup=keyboard(names))
-    bot.register_next_step_handler(message, register_name, current_class)
+    register_next_step_handler(message, register_name, current_class)
 
 
 def register_name(message: Message, class_letter):
@@ -748,17 +765,17 @@ def register_name(message: Message, class_letter):
 
     if not all(i in 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя ' for i in set(message.text.lower())):
         send_message(message.from_user.id, 'Ожидались только русские буквы. Попробуй ещё раз.')
-        bot.register_next_step_handler(message, register_name, class_letter)
+        register_next_step_handler(message, register_name, class_letter)
         return
 
     if len(message.text.split()) != 2:
         send_message(message.chat.id, 'Ожидались имя и фамилия через пробел. Попробуй ещё раз.')
-        bot.register_next_step_handler(message, register_name, class_letter)
+        register_next_step_handler(message, register_name, class_letter)
         return
 
     # Переспрашиваем, зарегистрироваться ли
     send_message(message.chat.id, f'Проживаешь ли ты в общежитии?', reply_markup=bool_keyboard())
-    bot.register_next_step_handler(message, register_dorm, message.text.title(), class_letter)
+    register_next_step_handler(message, register_dorm, message.text.title(), class_letter)
 
 
 def register_dorm(message: Message, name, class_letter):
@@ -773,15 +790,15 @@ def register_dorm(message: Message, name, class_letter):
         citizen = True
 
     else:
-        send_message(message.chat.id, choice(DO_NOT_UNDERSTAND), reply_markup=bool_keyboard())
-        bot.register_next_step_handler(message, register_dorm, name, class_letter)
+        send_message(message.chat.id, DO_NOT_UNDERSTAND, reply_markup=bool_keyboard())
+        register_next_step_handler(message, register_dorm, name, class_letter)
         return
 
     # Переспрашиваем, зарегистрироваться ли
     send_message(message.chat.id, f'Итак, ты - ученик(ца) {class_letter} класса, {name}, '
                                   f'{"не " * citizen}проживаешь в общежитии.\nВсё верно?',
                  reply_markup=bool_keyboard())
-    bot.register_next_step_handler(message, register_end, name, class_letter, citizen)
+    register_next_step_handler(message, register_end, name, class_letter, citizen)
 
 
 def register_end(message: Message, name: str, class_letter: str, citizen: bool):
@@ -827,8 +844,8 @@ def register_end(message: Message, name: str, class_letter: str, citizen: bool):
         send_message(message.chat.id, 'Регистрация отменена')
 
     else:
-        send_message(message.chat.id, choice(DO_NOT_UNDERSTAND))
-        bot.register_next_step_handler(message, register_end, name, class_letter, citizen)
+        send_message(message.chat.id, DO_NOT_UNDERSTAND)
+        register_next_step_handler(message, register_end, name, class_letter, citizen)
 
 
 def send_notification():
@@ -866,14 +883,14 @@ def send_report(letter=None):
         clear = True
 
         # Опять же, чтобы не вызывалось по выходным и праздникам
-        planning_day = get_planning_day(formatted=False, strong=10).strftime("%d.%m")
+        planning_day = get_planning_day(formatted=False, strong=1).strftime("%d.%m")
         if planning_day in HOLIDAYS:
             log(f'send_report was aborted because {planning_day} in holidays', send_admin=True)
             return
 
     for let in [letter] if letter else LETTERS:
         # Список id учеников класса в отсортированном по именам порядке
-        cur_class = sorted([x for x in students if students[x][CLASS] == let], key=lambda x: students[x][NAME])
+        cur_class = [student_id for student_id in students if students[student_id][CLASS] == let]
 
         no_data = breakfast = lunch = poldnik = visit = no_visit = ''
         data = [0] * 6  # Количество людей [нет данных, завтрак, обед, полдник, в школе, не в школе]
@@ -881,7 +898,7 @@ def send_report(letter=None):
         for student_id in cur_class:
             student = students[student_id]
 
-            if None in [student.get(BREAKFAST), student.get(POLDNIK)] and student.get(CITIZEN) \
+            if student.get(CITIZEN) and None in [student.get(BREAKFAST), student.get(POLDNIK)] \
                     or student.get(LUNCH) is None:
                 data[0] += 1
                 no_data += f'{data[0]}. {student[NAME]}\n'
@@ -890,28 +907,28 @@ def send_report(letter=None):
                     # Оповещаем ученика о том, что он голодает
                     send_message(student_id, f'Вы так и не ответили боту. Отчёт был отправлен классным советникам')
 
-            if student.get(CITIZEN) and student.get(BREAKFAST):  # Будет завтракать
+            if student.get(CITIZEN) and student.get(BREAKFAST, 0) in (1, 2):  # Будет завтракать
                 data[1] += 1
                 breakfast += f'{data[1]}. {student[NAME]}\n'
 
-            if student.get(LUNCH):  # Будет обедать
+            if student.get(LUNCH, 0) in (1, 2):  # Будет обедать
                 data[2] += 1
                 lunch += f'{data[2]}. {student[NAME]}\n'
 
-            if student.get(CITIZEN) and student.get(POLDNIK):  # Будет полдничать
+            if student.get(CITIZEN) and student.get(POLDNIK, 0) in (1, 2):  # Будет полдничать
                 data[3] += 1
                 poldnik += f'{data[3]}. {student[NAME]}\n'
 
-            if student.get(VISIT):  # Будет в школе
+            if student.get(VISIT, 0) in (1, 2):  # Будет в школе
                 data[4] += 1
                 visit += f'{data[4]}. {student[NAME]}\n'
 
-            elif student.get(VISIT) is not None:  # Не будет в школе
+            elif student.get(VISIT, 0) in (0, 3):  # Не будет в школе
                 data[5] += 1
                 no_visit += f'{data[5]}. {student[NAME]}: ' \
                             f'"{student.get(REASON) or "Причина не была указана."}"\n'  # Вот он пёс
 
-        text = f'Заявка {get_planning_day(na=True, strong=10)} составлена:\n'
+        text = f'Заявка {get_planning_day(na=True, strong=1)} составлена:\n'
         # Формирование красивого списка для классного руководителя
         if data[1]:
             text += f"{reform('будет', data[1]).capitalize()} завтракать {data[1]} " \
@@ -950,24 +967,24 @@ def send_report(letter=None):
             for admin in ADMINS:  # Здесь он дублирует это админам, было очень важно на стадии отладки
                 send_message(admin, f'Класс {let}:\n' + text)
 
-        # Я не случайно перенёс этот фрагмент сюда.
-        # В случае, если функция не доработает до конца, данные останутся целы
-        for student_id in students:
-            student = students[student_id]
+    # Я не случайно перенёс этот фрагмент сюда.
+    # В случае, если функция не доработает до конца, данные останутся целы
+    for student_id in students:
+        student = students[student_id]
 
-            if student.get(CITIZEN):
-                if student.get(BREAKFAST) not in (2, 3):
-                    student[BREAKFAST] = None
-                if student.get(POLDNIK) not in (2, 3):
-                    student[POLDNIK] = None
+        if student.get(CITIZEN):
+            if student.get(BREAKFAST) not in (2, 3):
+                student[BREAKFAST] = None
+            if student.get(POLDNIK) not in (2, 3):
+                student[POLDNIK] = None
 
-            if student.get(LUNCH) not in (2, 3):
-                student[LUNCH] = None
-            if student.get(VISIT) not in (2, 3):
-                student[VISIT] = None
+        if student.get(LUNCH) not in (2, 3):
+            student[LUNCH] = None
+        if student.get(VISIT) not in (2, 3):
+            student[VISIT] = None
 
-        # В конце записываем изменения (очистку внесенных данных)
-        dump(users, USERS)
+    # В конце записываем изменения (очистку внесенных данных)
+    dump(users, USERS)
 
 
 def run_schedule():
