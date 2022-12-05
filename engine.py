@@ -1,6 +1,13 @@
+import sys
+import os
 from telebot.types import *
 from datetime import datetime as dt, timedelta as td, date
+
+if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+    os.environ["PYMORPHY2_DICT_PATH"] = r"C:\Users\Жилое 84\Games\venv\Lib\site-packages\pymorphy2_dicts_ru\data"
+
 import pymorphy2
+import pymorphy2_dicts_ru
 
 from config import *
 
@@ -85,6 +92,7 @@ def reform(word: str, n: int) -> str:
             return word
         return 'будут'
 
+    pymorphy2_dicts_ru.get_path()
     # Чтобы изменять слова по числительным
     morph = pymorphy2.MorphAnalyzer()
 
