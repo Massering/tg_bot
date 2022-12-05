@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "echo \"Build\" && main.exe",
+    "build": "echo \"Build\" && pip install -r requirements.txt",
     "test": "echo \"Test\"",
-    "start": "echo \"START!\" && main.exe"
+    "start": "echo \"START!\" && py main.py"
   },
   "repository": {
     "type": "git",
