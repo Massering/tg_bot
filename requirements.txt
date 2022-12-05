@@ -1,7 +1,5 @@
 certifi==2022.9.24
 charset-normalizer==2.0.12
-cx-Freeze==6.13.1
-cx-Logging==3.1.0
 DAWG-Python==0.7.2
 docopt==0.6.2
 idna==3.4
