@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "echo \"Build\" && ls && cd tg_bot && main",
+    "build": "echo \"Build\" && main.exe",
     "test": "echo \"Test\"",
-    "start": "echo \"START!\" && main"
+    "start": "echo \"START!\" && main.exe"
   },
   "repository": {
     "type": "git",
