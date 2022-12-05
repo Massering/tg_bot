@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "echo \"Build\" && cd tg_bot && main",
+    "build": "echo \"Build\" && ls && cd tg_bot && main",
     "test": "echo \"Test\"",
     "start": "echo \"START!\" && main"
   },
