@@ -5,7 +5,7 @@
   "scripts": {
     "build": "echo \"Build\"",
     "test": "echo \"Test\"",
-    "start": "echo \"START!\" && main.exe"
+    "start": "echo \"START!\" && main1.exe"
   },
   "repository": {
     "type": "git",
