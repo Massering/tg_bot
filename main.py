@@ -26,7 +26,8 @@ if not os.path.exists(USERS):
     }, USERS)
 
 users = json.load(open(USERS, 'r', encoding=ENCODING))
-students = {int(i): users[STUDENTS][i] for i in sorted(users[STUDENTS], key=lambda x: (users[STUDENTS][x][CLASS], users[STUDENTS][x][NAME]))}
+students = {int(i): users[STUDENTS][i] for i in
+            sorted(users[STUDENTS], key=lambda x: (users[STUDENTS][x][CLASS], users[STUDENTS][x][NAME]))}
 LETTERS = {i: users[CLASSES][i] for i in users[CLASSES]}
 users = {
     STUDENTS: students,
@@ -37,7 +38,7 @@ users = {
 bot = telebot.TeleBot(TOKEN)
 
 
-def send_message(user_id: int, text: Union[str, list], reply_markup=None):
+def send_message(user_id: int, text: Union[str, list], reply_markup=None, silently=False):
     """Функция, принимающая id пользователя и текст, который бот ему отправит. Создана для удобства"""
     if isinstance(text, list):
         text = choice(text)
@@ -50,7 +51,7 @@ def send_message(user_id: int, text: Union[str, list], reply_markup=None):
     error = 'Из-за отключения интернета бот не может отправить сообщение'
     while 1:
         try:
-            bot.send_message(user_id, text, reply_markup=reply_markup)
+            bot.send_message(user_id, text, reply_markup=reply_markup, disable_notification=silently)
             if many_errors:
                 log(str(error) + f' x{many_errors}', send_admin=True, to_file=True)
                 many_errors = 0
@@ -157,13 +158,13 @@ def send_message_by_input():
             log(f'Как ты смог допустить ошибку "{error.__class__} - {error}"')
 
 
-def log(message, send_admin=False, to_file=False, from_start=False):
+def log(message, send_admin=False, to_file=False, from_start=False, silently=False):
     """Вывод в консоль уведомления о сообщении боту + Проверка сообщения (на содержание команд и выход)"""
 
     if send_admin:
         # Уведомление админа личным сообщением в тг (о чем-то важном)
         for admin in ADMINS:
-            send_message(admin, str(message))
+            send_message(admin, str(message), silently=silently)
 
     if to_file:
         # Запись в файл logs - для удобства логирования
@@ -410,7 +411,7 @@ def send_message_by_id_1(message: Message, recipient_id):
         send_message(recipient_id, get_fullname(message.from_user.id, True, True) + ' написал Вам: \n' + message.text)
 
         send_message(ADMINS[0], f'Отправлено to {get_fullname(recipient_id, True, True)} from '
-                                f'{get_fullname(message, True, True)} "{message.text}"')
+                                f'{get_fullname(message, True, True)} "{message.text}"', silently=True)
         send_message(message.chat.id, f'Отправлено to {get_fullname(recipient_id)}: "{message.text}"')
 
 
@@ -473,7 +474,7 @@ def del_user(message: Message):
     user_id = message.from_user.id
     if message.text.lower() in POSITIVE:
         send_message(LETTERS[students[user_id][CLASS]], students[user_id][NAME] + ' покидает Ваш класс.')
-        send_message(ADMINS[0], get_fullname(user_id, True, True) + ' удаляется из системы.')
+        send_message(ADMINS[0], get_fullname(user_id, True, True) + ' удаляется из системы.', silently=True)
 
         del students[user_id]
 
@@ -493,7 +494,8 @@ def del_student(message: Message, cur_class):
 
     for student in cur_class:
         if students[student][NAME] == message.text:
-            send_message(ADMINS[0], get_fullname(student, True, True) + ' был удален его классным советником.')
+            send_message(ADMINS[0], get_fullname(student, True, True) + ' был удален его классным советником.',
+                         silently=True)
             send_message(message.chat.id, f'Ученик {get_fullname(student)} был удален из Вашего класса')
 
             del students[student]
@@ -834,7 +836,7 @@ def register_end(message: Message, name: str, class_letter: str, citizen: bool):
         # В любом случае оповещаем классного советника о том, что такой-то ученик присоединился к классу
         text = f'Ученик(ца) с id {message.from_user.id}, с именем "{name}", присоединяется к '
         for admin_id in ADMINS:
-            send_message(admin_id, text + f'классу {class_letter}.')
+            send_message(admin_id, text + f'классу {class_letter}.', silently=True)
         text += 'Вашему классу. Если это не Ваш(а) ученик(ца), пожалуйста, сообщите имя и id это человека ' \
                 'администратору @chmorodina или удалите самостоятельно, используя функцию /del_student'
         send_message(LETTERS[class_letter], text)
@@ -849,12 +851,12 @@ def register_end(message: Message, name: str, class_letter: str, citizen: bool):
 
 def send_notification():
     """Функция оповещения учеников, всё ещё не сделавших свой выбор (по вечерам это почти все)"""
-    log('send_notification was called', send_admin=True)  # Оповещаем админа (допустимо отключить...)
+    log('send_notification was called', send_admin=True, silently=True)  # Оповещаем админа (допустимо отключить...)
 
     # Это чтобы функция не вызывалась по праздникам и выходным
     planning_day = get_planning_day(formatted=False).strftime("%d.%m")
     if planning_day in HOLIDAYS:
-        log(f'send_notification was aborted because {planning_day} in holidays', send_admin=True)
+        log(f'send_notification was aborted because {planning_day} in holidays', send_admin=True, silently=True)
         return
 
     for student in students:
@@ -878,13 +880,13 @@ def send_report(letter=None):
         clear = False
 
     else:
-        log('send_report was called', send_admin=True)
+        log('send_report was called', send_admin=True, silently=True)
         clear = True
 
         # Опять же, чтобы не вызывалось по выходным и праздникам
         planning_day = get_planning_day(formatted=False, strong=1).strftime("%d.%m")
         if planning_day in HOLIDAYS:
-            log(f'send_report was aborted because {planning_day} in holidays', send_admin=True)
+            log(f'send_report was aborted because {planning_day} in holidays', send_admin=True, silently=True)
             return
 
     for let in [letter] if letter else LETTERS:
@@ -962,9 +964,9 @@ def send_report(letter=None):
 
         send_message(LETTERS[let], text)
 
-        if any(data):
-            for admin in ADMINS:  # Здесь он дублирует это админам, было очень важно на стадии отладки
-                send_message(admin, f'Класс {let}:\n' + text)
+        # if any(data):
+        #     for admin in ADMINS:  # Здесь он дублирует это админам, было очень важно на стадии отладки
+        #         send_message(admin, f'Класс {let}:\n' + text, silently=True)
 
     # Я не случайно перенёс этот фрагмент сюда.
     # В случае, если функция не доработает до конца, данные останутся целы
@@ -988,9 +990,6 @@ def send_report(letter=None):
 
 def run_schedule():
     """Функция, настраивающая библиотеку schedule, напоминания и отчёты"""
-    # Не ругаися насяника
-    schedule.every().day.at(MORNING_TIME).do(send_message, ADMINS[0], 'Доброе утро, господин, удачного дня')
-
     # Понедельник
     schedule.every().monday.at(EARLY_MORNING_TIME).do(send_notification)
     schedule.every().monday.at(MORNING_TIME).do(send_notification)
