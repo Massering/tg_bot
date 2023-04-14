@@ -7,7 +7,8 @@
       "school_visit": null,
       "citizen": false,
       "breakfast": null,
-      "afternoon_snack": null
+      "afternoon_snack": null,
+      "reason": "Прогуливаю"
     },
     "890446591": {
       "class": "γ (Гамма)",
@@ -44,7 +45,7 @@
       "school_visit": 2,
       "citizen": true,
       "breakfast": 2,
-      "afternoon_snack": null
+      "afternoon_snack": 2
     },
     "1658331986": {
       "class": "γ (Гамма)",
@@ -63,7 +64,7 @@
       "citizen": true,
       "breakfast": null,
       "afternoon_snack": null,
-      "reason": "Буду в больнице лежать"
+      "reason": "Соревнования по волейболу"
     },
     "781105238": {
       "class": "γ (Гамма)",
@@ -251,8 +252,8 @@
     "991597923": {
       "class": "δ (Дельта)",
       "name": "Дьяков Кирилл",
-      "lunch": null,
-      "school_visit": null,
+      "lunch": 2,
+      "school_visit": 2,
       "citizen": false,
       "breakfast": null,
       "afternoon_snack": null,
@@ -449,23 +450,13 @@
       "breakfast": null,
       "afternoon_snack": null
     },
-    "5267108794": {
-      "class": "ε (Эпсилон)",
-      "name": "Рабчевская Марина",
-      "citizen": true,
-      "lunch": null,
-      "school_visit": null,
-      "reason": null,
-      "breakfast": null,
-      "afternoon_snack": null
-    },
     "800527789": {
       "class": "ε (Эпсилон)",
       "name": "Рыженкова Алина",
       "citizen": false,
       "lunch": null,
       "school_visit": null,
-      "reason": "Болею"
+      "reason": "Олимпиада"
     },
     "639555385": {
       "class": "ε (Эпсилон)",
@@ -598,7 +589,7 @@
       "citizen": false,
       "breakfast": null,
       "afternoon_snack": null,
-      "reason": "Болею"
+      "reason": "У нас каникулы))"
     },
     "884131205": {
       "class": "ζ (Дзета)",
@@ -680,7 +671,7 @@
       "school_visit": 2,
       "citizen": true,
       "breakfast": 3,
-      "afternoon_snack": null
+      "afternoon_snack": 3
     },
     "1024648481": {
       "class": "η (Эта)",
@@ -759,12 +750,12 @@
     "1997463532": {
       "class": "η (Эта)",
       "name": "Кожура Илья",
-      "lunch": null,
+      "lunch": 3,
       "school_visit": null,
       "citizen": false,
       "breakfast": null,
       "afternoon_snack": null,
-      "reason": "уеду"
+      "reason": "аааааааа"
     },
     "1503984259": {
       "class": "η (Эта)",
@@ -856,7 +847,7 @@
       "citizen": true,
       "breakfast": null,
       "afternoon_snack": null,
-      "reason": "ЭКГ"
+      "reason": "Болею"
     },
     "1868213058": {
       "class": "ι (Йота)",
@@ -893,7 +884,7 @@
       "citizen": true,
       "breakfast": 2,
       "afternoon_snack": null,
-      "reason": "ВсОШ по астрономии"
+      "reason": "Инженерная школа"
     },
     "1344741369": {
       "class": "ι (Йота)",
@@ -963,8 +954,8 @@
     "1069934389": {
       "class": "ι (Йота)",
       "name": "Постоева Анастасия",
-      "lunch": 2,
-      "school_visit": 2,
+      "lunch": 3,
+      "school_visit": null,
       "citizen": false,
       "breakfast": null,
       "afternoon_snack": null
@@ -972,7 +963,7 @@
     "2078652234": {
       "class": "ι (Йота)",
       "name": "Ровняго Дмитрий",
-      "lunch": 2,
+      "lunch": null,
       "school_visit": 2,
       "reason": "Болею",
       "breakfast": null,
@@ -983,11 +974,11 @@
       "class": "ι (Йота)",
       "name": "Рудаков Максимка",
       "lunch": 2,
-      "school_visit": 2,
+      "school_visit": null,
       "citizen": true,
       "breakfast": 2,
       "afternoon_snack": null,
-      "reason": "Пишу олимпиаду"
+      "reason": "Я не сдаю физику"
     },
     "1822590281": {
       "class": "ι (Йота)",
@@ -1011,7 +1002,7 @@
     "979923466": {
       "class": "ι (Йота)",
       "name": "София Совкова",
-      "lunch": 3,
+      "lunch": 2,
       "school_visit": null,
       "citizen": false,
       "breakfast": null,
@@ -1034,7 +1025,8 @@
       "school_visit": 2,
       "citizen": false,
       "breakfast": null,
-      "afternoon_snack": null
+      "afternoon_snack": null,
+      "reason": "Юниор"
     },
     "1987908012": {
       "class": "ι (Йота)",
@@ -1069,7 +1061,7 @@
       "citizen": false,
       "lunch": null,
       "school_visit": null,
-      "reason": null
+      "reason": "Заболела"
     },
     "583054176": {
       "class": "φ (Фи)",
@@ -1121,10 +1113,11 @@
       "class": "φ (Фи)",
       "name": "Исаченко Матвей",
       "lunch": null,
-      "school_visit": 2,
+      "school_visit": null,
       "citizen": false,
       "breakfast": null,
-      "afternoon_snack": null
+      "afternoon_snack": null,
+      "reason": "Каникулы"
     },
     "1245500653": {
       "class": "φ (Фи)",
@@ -1178,9 +1171,9 @@
       "class": "φ (Фи)",
       "name": "Нестерова Мария",
       "citizen": false,
-      "lunch": null,
-      "school_visit": null,
-      "reason": null
+      "lunch": 3,
+      "school_visit": 3,
+      "reason": "Перевелась в другую школу"
     },
     "485766896": {
       "class": "φ (Фи)",
@@ -1199,7 +1192,7 @@
       "school_visit": 2,
       "citizen": true,
       "breakfast": 2,
-      "afternoon_snack": null
+      "afternoon_snack": 2
     },
     "1959214466": {
       "class": "φ (Фи)",
@@ -1217,8 +1210,8 @@
       "lunch": 2,
       "school_visit": 2,
       "reason": null,
-      "breakfast": null,
-      "afternoon_snack": null
+      "breakfast": 2,
+      "afternoon_snack": 2
     },
     "5004573631": {
       "class": "φ (Фи)",
@@ -1262,11 +1255,11 @@
     "5167914878": {
       "class": "χ (Хи)",
       "name": "Александров Лев",
-      "lunch": null,
-      "school_visit": null,
+      "lunch": true,
+      "school_visit": true,
       "citizen": true,
-      "breakfast": null,
-      "afternoon_snack": null,
+      "breakfast": true,
+      "afternoon_snack": true,
       "reason": "Болею. До 21 точно дома"
     },
     "5113801796": {
@@ -1331,7 +1324,7 @@
       "citizen": true,
       "breakfast": null,
       "afternoon_snack": null,
-      "reason": "Я точно не уверена, но обо всем предупрежу заранее!"
+      "reason": "Каникулы"
     },
     "906734466": {
       "class": "χ (Хи)",
@@ -1375,10 +1368,11 @@
       "class": "χ (Хи)",
       "name": "Поддубная Дарья",
       "lunch": null,
-      "school_visit": 2,
+      "school_visit": null,
       "citizen": false,
       "breakfast": null,
-      "afternoon_snack": null
+      "afternoon_snack": null,
+      "reason": "Каникулы"
     },
     "957952960": {
       "class": "χ (Хи)",
@@ -1423,7 +1417,7 @@
       "lunch": null,
       "school_visit": null,
       "reason": "олимпиада",
-      "breakfast": null,
+      "breakfast": 2,
       "afternoon_snack": null
     }
   },

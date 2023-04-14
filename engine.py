@@ -3,6 +3,9 @@ import os
 from telebot.types import *
 from datetime import datetime as dt, timedelta as td, date
 
+if "linux" in sys.platform:
+    os.system('export TZ=Asia/Krasnoyarsk')
+
 if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
     os.environ["PYMORPHY2_DICT_PATH"] = r"C:\Users\Жилое 84\Games\venv\Lib\site-packages\pymorphy2_dicts_ru\data"
 

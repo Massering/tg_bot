@@ -66,8 +66,14 @@ def send_message(user_id: int, text: Union[str, list], reply_markup=None, silent
                 if 'bot was blocked by the user' in str(err):  # Ситуация плохая, надеемся, такого не случится
                     error = f'Пользователь {get_fullname(user_id, True, True)} заблокировал ' \
                             f'бота и был удален.'
-                    # del students[user_id]
-                    # dump(users, USERS)
+
+                    # if user_id in students:
+                    #     send_message(LETTERS[students[user_id][CLASS]],
+                    #                  f'Ученик {get_fullname(user_id)} остановил '\
+                    #                  'работу бота и был удален из Вашего класса.')
+                    #
+                    #     del students[user_id]
+                    #     dump(users, USERS)
 
                 elif 'chat not found' in str(err):
                     if user_id in students:
@@ -243,6 +249,10 @@ def start(message: Message):
         lord_id, class_letter = message.text.split(maxsplit=1)[1].split('=')
         make_lord(int(lord_id), class_letter)
 
+    elif message.text == '/del_student' and user_id in ADMINS:
+        send_message(chat_id, 'Введите имя или id того, кого хотите удалить')
+        register_next_step_handler(message, del_student)
+
     elif user_id in LETTERS.values():
         # Если пользователь - классный советник, у него есть свои функции кроме вышеупомянутых
         *_, letter = sorted(i[0] for i in LETTERS.items() if i[1] == user_id)
@@ -277,7 +287,7 @@ def start(message: Message):
         elif message.text == '/del_student':
             send_message(chat_id, 'Выберите из списка имя того, кого хотите удалить',
                          reply_markup=class_list)
-            register_next_step_handler(message, del_student, cur_class)
+            register_next_step_handler(message, del_student)
 
         else:
             # Иначе даем список команд
@@ -303,11 +313,6 @@ def start(message: Message):
 
         send_message(chat_id, f'Теперь ты {"не " * students[user_id][CITIZEN]}живёшь в общаге!')
         ask_all(message, from_function=True)
-
-    elif message.text == '/permanently':
-        send_message(chat_id, 'В связи с обновлением, функция перестала существовать. '
-                              f'Пожалуйста, выбери варианты "{ALWAYS}" и "{ALWAYS_NOT}" там, где нужно')
-        ask_all(message, from_start=True)
 
     elif message.text == '/rename':
         send_message(chat_id, 'Введи новое имя')
@@ -487,28 +492,39 @@ def del_user(message: Message):
         send_message(message.chat.id, 'Ну и славно)')
 
 
-def del_student(message: Message, cur_class):
+def del_student(message: Message):
     """Функция, получающая имя ученика, которого хочет удалить классный советник"""
     if log(message):
         return
 
-    for student in cur_class:
-        if students[student][NAME] == message.text:
-            send_message(ADMINS[0], get_fullname(student, True, True) + ' был удален его классным советником.',
-                         silently=True)
-            send_message(message.chat.id, f'Ученик {get_fullname(student)} был удален из Вашего класса')
+    for student in students:
+        if students[student][NAME] == message.text and \
+                message.from_user.id in ADMINS or students[student][CLASS] == get_letter(message.from_user.id):
+            if message.from_user.id in ADMINS:
+                send_message(ADMINS[0], get_fullname(student, True, True) + ' был удален.')
+                send_message(LETTERS[students[student][CLASS]],
+                             f'Ученик {get_fullname(student)} был удален из Вашего класса администратором.')
+                send_message(student, 'Вы были удалены администратором. Очень жаль.')
+
+            else:
+                send_message(ADMINS[0], get_fullname(student, True, True) + ' был удален его классным советником.',
+                             silently=True)
+                send_message(message.chat.id, f'Ученик {get_fullname(student)} был удален из Вашего класса')
+                send_message(student, 'Вы были удалены Вашим классным советником. Очень жаль.')
 
             del students[student]
-
-            # Перезапись файла
             dump(users, USERS)
 
             send_message(student, 'Вы были удалены Вашим классным советником. Очень жаль.')
             break
 
     else:
-        send_message(message.chat.id, 'Извините, в Вашем классе нет ученика с таким именем. '
-                                      'Нажмите /del_student и попробуйте снова')
+        if message.from_user.id in ADMINS:
+            send_message(message.chat.id, 'Извините, в школе нет ученика с таким именем. '
+                                          'Нажмите /del_student и попробуйте снова')
+        else:
+            send_message(message.chat.id, 'Извините, в Вашем классе нет ученика с таким именем. '
+                                          'Нажмите /del_student и попробуйте снова')
 
 
 def ask_all(message: Message, from_start=False, from_function=False):
@@ -1024,6 +1040,9 @@ def run_schedule():
 
     # Воскресенье
     schedule.every().sunday.at(EVENING_TIME).do(send_notification)
+
+    # Это для того, чтобы бот не "засыпал" на сервере pythonanywhere
+    schedule.every(1).hours.do(send_message, 5911839798, 'Я не сплю', silently=True)
 
     # Помечаем время и то, что всё прошло успешно
     log('Schedule started', to_file=True)
