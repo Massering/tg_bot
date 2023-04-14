@@ -281,12 +281,12 @@ def start(message: Message):
 
         elif message.text == '/rename':
             send_message(chat_id, 'Выберите из списка имя того, кого хотите переименовать',
-                         reply_markup=class_list)
+                         reply_markup=keyboard(class_list))
             register_next_step_handler(message, rename, cur_class)
 
         elif message.text == '/del_student':
             send_message(chat_id, 'Выберите из списка имя того, кого хотите удалить',
-                         reply_markup=class_list)
+                         reply_markup=keyboard(class_list))
             register_next_step_handler(message, del_student)
 
         else:
@@ -499,7 +499,7 @@ def del_student(message: Message):
 
     for student in students:
         if students[student][NAME] == message.text and \
-                message.from_user.id in ADMINS or students[student][CLASS] == get_letter(message.from_user.id):
+                (message.from_user.id in ADMINS or students[student][CLASS] == get_letter(message.from_user.id)):
             if message.from_user.id in ADMINS:
                 send_message(ADMINS[0], get_fullname(student, True, True) + ' был удален.')
                 send_message(LETTERS[students[student][CLASS]],
